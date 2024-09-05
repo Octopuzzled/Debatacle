@@ -1,0 +1,76 @@
+:root {
+    --background-color: #262626; /* Replace with your desired background color */
+    --font-heading: "Space Grotesk", sans-serif;
+    --font-gen: "Montserrat", sans-serif;
+    --text-bg: #C4D7E0; /* Light background for main content */
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-gen);
+    color: black;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+}
+
+.navbar {
+    background-color: rgba(--background-color, 0.8); /* Semi-transparent dark background */
+}
+
+.background-container {
+    background-image: url('blue-green.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 50vh; /* Reduced height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(--background-color,0.5); /* Text shadow for better readability */
+}
+
+.background-container .fs-1 {
+    background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent background for text */
+    padding: 20px;
+    border-radius: 10px;
+    font-family: var(--font-heading);
+}
+
+main.container {
+    flex-grow: 1;
+    background-color: var(--text-bg); 
+    border-radius: 15px 15px 0 0; /* Rounded top corners */
+    margin-top: -50px; /* Pull main content up */
+    position: relative; /* For z-index to work */
+    z-index: 1; /* Ensure main content is above the background image */
+    box-shadow: 0 -10px 20px rgba(--background-color,0.1); /* Shadow for depth */
+}
+
+footer {
+    background-color: rgba(--background-color, 0.8); /* Semi-transparent dark background */
+    padding: 10px 0;
+}
+
+@media (max-height: 600px) {
+    .background-container {
+        height: 40vh; /* Even smaller for very small screens */
+    }
+}
+
+/* Responsive layout styles */
+@media (max-width: 767px) {
+    .quick-start {
+      margin-bottom: 2rem;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .why-debates, .quick-start {
+      padding: 1rem;
+    }
+  }

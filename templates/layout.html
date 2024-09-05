@@ -12,30 +12,40 @@
         
          <link href="/static/styles.css" rel="stylesheet">
 
+        <!-- Font for headings: Space Grotesk-->
+         <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+
+        <!-- Font for normal text: Montserrat-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+
          <title>Debatacle</title>
     </head>
 
-    <body>
-        <nav class="navbar navbar-dark navbar-expand-lg bg-dark">
+    <body class="bg-dark">
+        <nav class="navbar navbar-dark navbar-expand-lg">
             <div class="container-fluid">
-              <a class="navbar-brand" href="#">Debatacle</a>
+              <a class="navbar-brand" href="/">Debatacle</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">About Debatacle</a>
+                    <a class="nav-link active" aria-current="page" href="/start">Start here</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#">Let's debate</a>
                   </li>
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Topics
+                      Levels
                     </a>
                     <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Introduction to Arguments</a></li>
+                      <li><a class="dropdown-item" href="/vocabulary">Level 1: basic vocabulary</a></li>
                       <li><a class="dropdown-item" href="#">Introduction to Logic</a></li>
                       <li><a class="dropdown-item" href="#">Advanced concepts</a></li>
                     </ul>
@@ -49,7 +59,15 @@
             </div>
           </nav>
 
-        <main class="container py-5 text-center">
+          <section class="background-container">
+            <div class="fs-1 text-center">
+              <p>Everyone has something to say</p>
+              <p>- let's navigate the chaos with logic</p>
+            </div>
+          </section>
+            
+
+        <main class="container py-5">
             {% block main %}{% endblock %}
         </main>
 
