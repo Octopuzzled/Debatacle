@@ -51,6 +51,14 @@ main.container {
     box-shadow: 0 -10px 20px rgba(--background-color,0.1); /* Shadow for depth */
 }
 
+.text-green {
+    color: #236C74;
+}
+
+.text-orange {
+    color: rgb(185, 100, 51);
+}
+
 footer {
     background-color: rgba(--background-color, 0.8); /* Semi-transparent dark background */
     padding: 10px 0;
