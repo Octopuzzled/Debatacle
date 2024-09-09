@@ -1,8 +1,15 @@
 :root {
-    --background-color: #262626; /* Replace with your desired background color */
+    --background-color: #262626; 
     --font-heading: "Space Grotesk", sans-serif;
     --font-gen: "Montserrat", sans-serif;
     --text-bg: #C4D7E0; /* Light background for main content */
+    /* Color palette */
+    --darkest: #00271C;
+    --dark: #236C74;
+    --medium: #87B3C1;
+    --light: #99BDCA;
+    --lightest: #C4D7E0;
+
   }
 
   body {
@@ -58,6 +65,81 @@ main.container {
 .text-orange {
     color: rgb(185, 100, 51);
 }
+
+.lesson-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.lesson-content {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.lesson-part {
+    flex: 0 0 100%;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.current-title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.lesson-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.nav-button-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: var(--darkest);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--dark);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.nav-title {
+    font-size: 14px;
+    color: #666;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 footer {
     background-color: rgba(--background-color, 0.8); /* Semi-transparent dark background */

@@ -6,74 +6,173 @@
 
 {% block main %}
 
-<section>
-    <p>vocabulary you'll learn here:</p>
-    <ul>
-        <li>propositions and arguments</li>
-        <li>premises and conclusions</li>
-        <li>validity and soundness</li>
-        <li>deductive and inductive</li>
-    </ul>
-<p>
-    Every time anyone wants to reasonably convince someone else, they give arguments. 
-    Reasons for why other people should believe them. We find that in science, politics 
-    and in our dayli life. But what is an argument? To get a first grasp, consider the 
-    following two texts. One of them is an argument, the other is not. Can you spot the 
-    difference?
-</p>
-<p>
-    Example 1:
-"Death Metal, along with Black and Thrash Metal, is a subgenre of extreme metal. 
-Its sound is characterized by hard, often dissonant melodies played on low-tuned guitars 
-and accompanied by fast drumming and guttural shouts."
-</p>
-<p>
-    Example 2:
-"Traffic jams are a common problem in many cities, and they are often caused by the 
-high number of cars on the road. Therefore, one way to reduce traffic congestion is 
-to encourage more people to use public transportation or carpool."
-</p>
-<p>
-    Example 1 and 2 are sequences of propositions, in which certain claims are made. 
-    But the difference is, that while Example 1 is informing the reader about something 
-    (Death Metal), Example 2 tries to convince the reader in some way to believe a 
-    statement to be true. The statement in question is "one way to reduce traffic congestion 
-    is to encourage more people to use public transportation or carpool". How does the 
-    convincing work? Exactly, by giving reasons that support this statement.
-</p>
-<p>
-    Accordingly, an argument is a sequence of propositions, accompanied by the claim 
-    that a part of these propositions (the premises) support another proposition in the 
-    sequence (the conclusion) in the sense that it is rational to hold the conclusion as 
-    true if the premises are true.
-</p>
-<p>
-    Yeah, that's a mouthful, I know. So let's look closer at Example 2, shall we?<br>
-    "<span class="text-green">Traffic jams are a common problem in many cities</span>, 
-    and <span class="text-green">they are often caused by the high number of cars on 
-    the road</span>. Therefore, <span class="text-orange">one way to reduce traffic 
-    congestion is to encourage more people to use public transportation or carpool</span>."
-</p>
-<p>
-    
-</p>
-<p>
-    
-</p>
-<p>
-    
-</p>
-<p>
-    
-</p>
-<p>
-    
-</p>
-<p>
-    
-</p>
-<p>
-    
-</p>
+<div class="lesson-container">
+    <div class="current-title" id="current-title"></div>
+    <div class="lesson-content">
+        <div class="lesson-part d-flex" data-title="Introduction">
+            <p>Vocabulary you'll learn here:</p>
+            <ul class="mx-auto">
+                <li>propositions and arguments</li>
+                <li>premises and conclusions</li>
+                <li>validity and soundness</li>
+                <li>deductive and inductive</li>
+            </ul>
+        </div>
+        <div class="lesson-part" data-title="Aargument basics">        
+            <p>
+                Every time anyone wants to reasonably convince someone else, they give arguments. 
+                Reasons for why other people should believe them. We find that in science, politics 
+                and in our dayli life. But what is an argument? To get a first grasp, consider the 
+                following two texts. One of them is an argument, the other is not. Can you spot the 
+                difference?
+            </p>
+            <p>
+                Example 1:
+            "Death Metal, along with Black and Thrash Metal, is a subgenre of extreme metal. 
+            Its sound is characterized by hard, often dissonant melodies played on low-tuned guitars 
+            and accompanied by fast drumming and guttural shouts."
+            </p>
+            <p>
+                Example 2:
+            "Traffic jams are a common problem in many cities, and they are often caused by the 
+            high number of cars on the road. Therefore, one way to reduce traffic congestion is 
+            to encourage more people to use public transportation or carpool."
+            </p>
+            <p>
+                Example 1 and 2 are sequences of propositions, in which certain claims are made. 
+                But the difference is, that while Example 1 is informing the reader about something 
+                (Death Metal), Example 2 tries to convince the reader in some way to believe a 
+                statement to be true. The statement in question is "one way to reduce traffic congestion 
+                is to encourage more people to use public transportation or carpool". How does the 
+                convincing work? Exactly, by giving reasons that support this statement.
+            </p>
+            <p>
+                Accordingly, an argument is a sequence of propositions, accompanied by the claim 
+                that a part of these propositions (the premises) support another proposition in the 
+                sequence (the conclusion) in the sense that it is rational to hold the conclusion as 
+                true if the premises are true.
+            </p>
+        </div>
+
+        <div class="lesson-part" data-title="Argument example">
+            <p>
+                Yeah, that's a mouthful, I know. So let's look closer at Example 2, shall we?<br>
+                "<span class="text-green">Traffic jams are a common problem in many cities</span>, 
+                and <span class="text-green">they are often caused by the high number of cars on 
+                the road</span>. Therefore, <span class="text-orange">one way to reduce traffic 
+                congestion is to encourage more people to use public transportation or carpool</span>."
+            </p>
+            <p>
+                You can see in green the premises. They just tell us something about the world: 
+            1. traffic jams are a problem, and
+            2. a frequent cause is too many cars on the road
+            What follows in this argument is the conclusion. The conclusion follows logically 
+            from the premises, meaning: if those statements are  true, then there is no other 
+            possibility but that the conclusion is also true. That's the claim at least. Part 
+            of looking at arguments is to figure out whether those premises are true and if 
+            the conclusion really follows. But yeah, I guess we can say, that if the problem 
+            is too many cars, then reducing the amount of cars would help. And we can achieve 
+            that if we "encourage more people to use public transportation or carpool."
+            </p>
+        </div>
+
+        <div class="lesson-part" data-title="Arguments = cakes">
+            <p>
+                Neat, so now we know what an argument is. Just some propositions, where some have 
+                the job is to to support another proposition so that we gotta think that proposition 
+                is true, if the supporting ones are true. So in a way ... Creating an argument 
+                is like baking a cake! You need the right ingredients for it to work. Just as a cake
+                requires specific ingredients that combine together to make something delicious, an 
+                argument needs relevant and true premises that support the conclusion, making it 
+                strong and convincing. Which also means that what makes a proposition a proposition 
+                is that it's a sentence that could be true or false in principle. But there are
+                exceptions.
+            </p>
+        </div>
+        <div class="lesson-part" data-title="Indexical expressions">
+            <P>
+                The exception are indexical expressions, such as "I", "here", "today":
+            </p>
+            <p>
+                (1) I am in London today.<br>
+                (2) Mary Shelley wrote "Frankenstein" here in 1816.
+            </p>
+            <p>
+                Depending on the context in which the above sentences are uttered, they can be either true or false, 
+                therefore they are not inherently either true or false! <br>
+                To make those statements true or false in principle, we need to rephrase them:
+            </p>
+            <p>
+                (1) Octopuzzled is in London today. <br>
+                (2) Mary Shelly wrote "Frankenstein" on Lake Geneva in 1816.
+            </p>
+            <p>
+                As you can see, you can simply fact check these statements, making them propositions. It doesn't 
+                matter whether it's easy to fact check, only, that it is possible in theory.
+            </p>
+        </div>
+
+        <div class="lesson-part" data-title="Good arguments">
+            <P>
+                Alright. We know what arguments are. But what distinguishes a good from a bad argument? 
+                After all, we could make some obviously bogus arguments right now: <br><br>
+                (1) Plains are mammals. <br>
+                (2) All mammals are living beings.<br>
+                (3) Plains are living beings.<br><br>
+                Now ... well ... can't argue with that, right? Of course we can! Because a good argument 
+                fulfills two requirements: it's both valid and the premises are true. The above argument 
+                is valid. If the premises were true, the conclusion (plains are living beings) would also 
+                be true. Validity is more about whether the propositions have a logical connection. 
+                And in our example they have one. Logic isn't about truth at all. But that's why good 
+                arguments don't just follow a logical structure. The premises also must be true. 
+            </p>
+            <p>
+                A good argument therefore is both valid and consists of true premises. 
+                We also say that those arguments are sound. 
+            </p>
+            <p>
+                To further illustrate, let's look at something that looks like an argument but isn't valid at all, 
+                although all the propositions are true:<br><br>
+                (1) On earth, rain usually falls down, not up.<br>
+                (2) The internet contains a lot of information.<br>
+                (3) Therefore, rabbits exist.
+            </p>
+        </div>
+
+        <div class="lesson-part" data-title="Validity: 2 types">
+            <P>
+                Now, technically, there are two forms of valid arguments. Deductive and inductive ones. 
+                Deductive valid arguments are like the Frankenstein argument or the plain argument. 
+                They must be true, if the conclusion logically follows from the premises. But you can 
+                also have inductive arguments. For inductive valid arguments, it is rational to belief 
+                that the conclusion is true, if the premises are true. Inductive arguments are more 
+                about observing the world and statistics. For example, if you look at 1000 different 
+                mammals and all have lungs, you can come the conclusion that all mammals have lungs. 
+                In theory, you could be wrong. But it's still rational to come to that conclusion. 
+                Or look at this inductive valid argument:<br><br>
+                (P1) 95% of all SuperMario players fail on their first attempt at the final boss.<br>
+                (P2) Arabella is a SuperMario player.<br>
+                (C) Arabella fails on her first attempt at the final boss.<br>
+            </p>
+            <p>
+                The conclusion is likely true, it's reasonable to take it for granted. But it could be wrong. 
+                Maybe Arabella is one of the only 5% of people who don't fail on their first attempt. 
+                Keeping this distinction between deductive and inductive in mind, is very important. 
+                While deductive sound arguments are always stronger than inductive sound arguments, we live 
+                with a lot of uncertainty and therefore frequently only can make statements about likelihood.
+            </p>
+        </div>
+    </div>
+    <div class="lesson-navigation">
+        <div class="nav-button-container">
+            <button id="prev-btn">Previous</button>
+            <span id="prev-title" class="nav-title"></span>
+        </div>
+        <div class="nav-button-container">
+            <span id="next-title" class="nav-title"></span>
+            <button id="next-btn">Next</button>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
