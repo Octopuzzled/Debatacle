@@ -14,6 +14,10 @@ Session(app)
 def index():
     return render_template("index.html")
 
+@app.route("/logical-structures")
+def structures():
+    return render_template("logical-structures.html")
+
 @app.route("/start")
 def start():
     return render_template("start.html")

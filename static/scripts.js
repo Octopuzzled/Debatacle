@@ -11,11 +11,21 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateNavigation() {
         prevBtn.disabled = currentPart === 0;
         nextBtn.disabled = currentPart === parts.length - 1;
-        content.style.transform = `translateX(-${currentPart * 100}%)`;
 
-        prevTitle.textContent = currentPart > 0 ? parts[currentPart - 1].dataset.title || 'Untitled' : '';
-        nextTitle.textContent = currentPart < parts.length - 1 ? parts[currentPart + 1].dataset.title || 'Untitled' : '';
-        currentTitle.textContent = parts[currentPart].dataset.title || 'Untitled';
+        parts.forEach((part, index) => {
+            if (index === currentPart) {
+                part.classList.add('active');
+            } else {
+                part.classList.remove('active');
+            }
+        });
+
+        prevTitle.textContent = currentPart > 0 ? parts[currentPart - 1].dataset.title : '';
+        nextTitle.textContent = currentPart < parts.length - 1 ? parts[currentPart + 1].dataset.title : '';
+        currentTitle.textContent = parts[currentPart].dataset.title;
+
+        prevBtn.parentElement.style.visibility = currentPart > 0 ? 'visible' : 'hidden';
+        nextBtn.parentElement.style.visibility = currentPart < parts.length - 1 ? 'visible' : 'hidden';
     }
 
     prevBtn.addEventListener('click', function() {

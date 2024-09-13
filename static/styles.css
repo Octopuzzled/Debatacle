@@ -76,6 +76,7 @@ main.container {
 .lesson-content {
     display: flex;
     transition: transform 0.5s ease;
+    margin-bottom: 20px;
 }
 
 .lesson-part {
@@ -83,6 +84,11 @@ main.container {
     flex-direction: column;
     padding: 20px;
     box-sizing: border-box;
+    display: none;
+}
+
+.lesson-part.active {
+    display: block;
 }
 
 .current-title {
@@ -109,6 +115,20 @@ main.container {
     display: flex;
     align-items: center;
     gap: 10px;
+    width: 45%; /* Adjust as needed */
+}
+
+.nav-button-container.next {
+    justify-content: flex-end;
+}
+
+.nav-title {
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 100px); /* Adjust based on button width */
 }
 
 button {
@@ -120,6 +140,7 @@ button {
     border: none;
     border-radius: 5px;
     transition: background-color 0.3s;
+    white-space: nowrap;
 }
 
 button:hover {
@@ -130,16 +151,6 @@ button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
-
-.nav-title {
-    font-size: 14px;
-    color: #666;
-    max-width: 150px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 
 footer {
     background-color: rgba(--background-color, 0.8); /* Semi-transparent dark background */

@@ -1,0 +1,332 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Homepage
+{% endblock %}
+
+{% block main %}
+
+<div class="lesson-container">
+    <div class="current-title" id="current-title"></div>
+    <div class="lesson-content">
+        <div class="lesson-part" data-title="Introduction">        
+            <p>
+                Let's dive into some of the juicy logic stuff! What you're learning here is most 
+                useful when you have the arguments you want to look at in writing. But, the more 
+                you get used to this way of looking at arguments, the easier it gets to use this 
+                knowledge on the fly, too. We'll start with two short arguments. 
+                Try to spot the difference:
+            </p>
+            <p>
+                (P1) When I smoke, I have a bad consciousness.<br>
+                (P2) I smoke.<br>
+                (C) I have a bad consciousness.
+            </p>
+            <p>
+                (P1) When a storm is coming, the barometer falls.<br>
+                (P2) The barometer isn't falling.<br>
+                (C) There won't be a storm.
+            </p>
+            <p>
+                The devil is in the detail here. Or rather, the logic is in the structure. 
+                The way the conclusion is supported by the premises differs. There are, of course, 
+                fancy latin words for each structure. The first one is called a Modus Ponens and 
+                the second one a Modus Tollens. You don't need to remember these terms if you don't 
+                plan on becoming a good philosopher but it's important to understand these structures 
+                to spot bad arguments.
+            </p>
+        </div>
+
+        <div class="lesson-part" data-title="Modus ponens">
+            <p>
+                To understand the Modus Ponens, look at the following argument. As you might have 
+                picked up in the previous lessons, we use P to indicate that something is a premise 
+                and C to indicate a conclusion.
+            </p>
+            <p>
+                (P1) If Ludwig is fluent in Spanish, he understands the word "cajón".<br>
+                (P2) Ludwig is fluent in Spanish.<br>
+                (C) Ludwig understands the word "cajón".
+            </p>
+            <P>
+                The fun thing about logic as a way of understanding arguments is that the content 
+                doesn't matter! We're only interested in the structure of the argument. You'll soon 
+                understand why. The structure of this argument can be broken down to:
+            </p>
+            <p>
+                p -> q<br>
+                p<br>
+                q
+            </p>
+            <p>
+                Yeah ... let's see why. The idea is to replace each individual proposition with a letter. 
+                So "If Ludwig is fluent in Spanish, he understands the word "cajón"." becomes p and 
+                "Ludwig is fluent in Spanish." becomes q. The arrow indicates a if then relationship. 
+                So if p is the case then q follows from that. So if p is the case, you can only conclude 
+                that q is also the case. Notice that the only thing we do is replace the propositions with 
+                letters. The structure stays the same and becomes more visible. 
+                So what if we switch the letters?
+            </p>
+            <p>p -&gt; q</p>
+            <p>q</p>
+            <p>p</p>
+            <p>
+                Looks fine? Nah, just plug in the propositions again and you'll see why this doesn't make a good argument:
+            </p>
+            <p>(P1) If Ludwig is fluent in Spanish, he understands the word "cajón".</p>
+            <p>(P2) Ludwig understands the word "cajón".</p>
+            <p>(K) Ludwig is fluent in Spanish.</p>
+            <p>
+                This argument suggests that if Ludwig knows the word "cajón", he must be fluent in Spanish. 
+                However, just because someone understands one word in a language, it doesn't necessarily 
+                mean they're fluent in that language. For instance, I can say "I love you" in several languages, 
+                but that doesn't mean I'm fluent or even understand anything else in those languages.
+            </p>
+            <p>
+                This type of error in reasoning is called a (logical) fallacy. If an argument follows this structure, 
+                it's never valid, and you don't even need to look at the content of the argument to know this. 
+                It might seem strange at first, but don't worry; you'll get the hang of it soon!
+            </p>
+        </div>
+
+        <div class="lesson-part" data-title="Necessary & sufficient">
+            <p>
+                To better understand fallacies, let's add some more terminology to your repertoire. 
+                In this argument, if Ludwig didn't understand the word "cajón", he wouldn't be fluent in Spanish. 
+                This means that understanding the word "cajón" is a necessary condition for fluency in Spanish. 
+                However, understanding just one word isn't sufficient to be considered fluent.
+            </p>
+            <p>
+                A necessary condition is a condition that must be present for something else to occur or be true. 
+                In contrast, a sufficient condition is a condition that, if met, guarantees that something else 
+                will occur or be true. Together, a necessary and sufficient condition means that if and only if 
+                the condition is met, the related event or statement will occur or be true.
+            </p>
+            <p>
+                Understanding these terms will help you identify and avoid logical fallacies in arguments.
+            </p>
+                
+        </div>
+
+        <div class="lesson-part" data-title="Modus Tollens">
+            <p>
+                We'll need the same terms to understand the structure of a Modus Tollens. This structure works with negation:
+            </p>
+            <table>
+                <tr>
+                    <td>(P1) If Ludwig is fluent in Spanish, he understands the word "cajón".</td>
+                    <td>p → q</td>
+                </tr>
+                <tr>
+                    <td>(P2) Ludwig does not understand the word "cajón".</td>
+                    <td>¬q</td>
+                </tr>
+                <tr>
+                    <td>(C) Ludwig is not fluent in Spanish.</td>
+                    <td>¬p</td>
+                </tr>
+            </table>
+            <p>
+                Ludwig doesn't understand the word "cajón", but since this is a necessary condition to be fluent in Spanish, 
+                he isn't fluent in Spanish. This is a valid logical structure. Generally, the if then condition always works 
+                the same way. It always gives a necessary but not sufficient condition for the if-part to be true.
+            </p>
+            <p>
+                Consider the modified argument:
+            </p>
+            <table>
+                <tr>
+                    <td>(P1) Ludwig is fluent in Spanish if and only if he can both understand and speak the language effectively.</td>
+                    <td>p ↔ q</td>
+                </tr>
+                <tr>
+                    <td>(P2) Ludwig can both understand and speak Spanish effectively.</td>
+                    <td>q</td>
+                </tr>
+                <tr>
+                    <td>(C) Ludwig is fluent in Spanish.</td>
+                    <td>p</td>
+                </tr>
+            </table>
+            <p>
+                In this argument, the "if and only if" condition establishes that Ludwig's ability to understand and speak Spanish 
+                effectively is both necessary and sufficient for fluency in the language. Necessary, because without these skills, 
+                Ludwig cannot be considered fluent; sufficient, because having these skills guarantees Ludwig's fluency in Spanish.
+            </p>
+            <p>
+                Breaking down the "if and only if" condition:
+            </p>
+            <ol>
+            <li>If Ludwig can understand and speak Spanish effectively, then he is fluent in Spanish (sufficient condition).</li>
+            <li>Only if Ludwig is fluent in Spanish can he understand and speak the language effectively (necessary condition).</li>
+            </ol>
+            <p>
+                So in this case, the "if and only if" condition ensures that the conclusion (Ludwig's fluency in Spanish) 
+                is both necessary and sufficient, given the premise (Ludwig's ability to understand and speak Spanish effectively).
+            </p>
+
+        </div>
+
+        <div class="lesson-part" data-title="Reductio ad absurdum">
+            <p>
+                How about one last structure to give you a solid foundation?
+            </p>
+            <table>
+                <tr>
+                    <td>(P1) The Earth is a disc.</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>(P2) If the Earth is a disc, then people fall off its edge.</td>
+                    <td>p → q</td>
+                </tr>
+                <tr>
+                    <td>(P3) People do not fall off the edge.</td>
+                    <td>¬q</td>
+                </tr>
+                <tr>
+                    <td>(C) The Earth is not a disc.</td>
+                    <td>¬p</td>
+                </tr>
+            </table>
+            <p>
+                This argument sets up a cause-and-effect relationship between the shape of the Earth and the expected 
+                consequence of people falling off its edge. Since we observe that people do not fall off the edge of 
+                the Earth (P3), it logically follows that the Earth cannot be a disc (C), given the premise (P2). 
+                We call this structure a reductio ad absurdum, which means reduction to absurdity.
+            </p>
+            <p>
+                In a reductio ad absurdum, you assume the truth of a premise and then show that it leads to an absurd 
+                or contradictory conclusion, thus demonstrating that the initial premise must be false.
+            </p>
+            <p>
+                Let's analyze the argument again, highlighting its reductio ad absurdum structure:
+            </p>
+            <ol>
+                <li>Assume the premise that the Earth is a disc (P1).</li>
+                <li>If the Earth is a disc, then it logically follows that people should fall off its edge (P2).</li>
+                <li>However, we observe that people do not fall off the edge of the Earth (P3), which contradicts 
+                    the expected consequence of a disc-shaped Earth.</li>
+                <li>Since the consequence is false, the initial premise (P1) that the Earth is a disc must also be false.</li>
+            </ol>
+            <p>
+                Thus, this argument effectively employs reductio ad absurdum to challenge the notion of a disc-shaped 
+                Earth by demonstrating an absurd or contradictory outcome. The structure of a reductio ad absurdum 
+                looks like this (in this case):
+            </p>
+            <table>
+                <tr>
+                    <td>p</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>p → q</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>¬q</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>¬p</td>
+                    <td></td>
+                </tr>
+            </table>                
+        </div>
+
+        <div class="lesson-part" data-title="Real life arguments are complicated">
+            <p>
+                Now, there are many more logical structures. If you want to dive deep into this topic, 
+                it's worth learning about them. But for casually analyzing your and others' arguments, y
+                ou already have a good foundation. Still, you might ask yourself, "Why bother looking at the structure?" 
+                There is one simple reason: arguments in the real world get complicated. 
+                They contain more than just two or three premises; there are hidden premises you've got to make explicit 
+                to understand the argument, and truly understanding the content gets hard. Therefore, we start with 
+                figuring out the structure of an argument and just see whether it's valid. Because if not, we don't 
+                even have to bother with fact-checking it. And if it is valid, we have already built a better 
+                understanding of the argument, and it's easier to understand the content and see whether the 
+                facts are factual or fiction.
+            </p>
+            <p>
+                To end this section, we'll look at a real-life example. This should give you an idea of the complexity 
+                of arguments, although this example isn't even too complicated:
+            </p>
+            <p>
+                <strong>WALLACE:</strong> Gentlemen, a lot of people have been waiting for this night, so let’s get going. 
+                Our first subject is the Supreme Court. President Trump, you nominated Amy Coney Barrett over the weekend 
+                to succeed the late Ruth Bader Ginsburg on the Court. You say the Constitution is clear about your 
+                obligation and the Senate’s to consider a nominee to the Court. Vice President Biden, you say that 
+                this is an effort by the President and Republicans to jam through on an appointment in what you call an 
+                abuse of power. My first question to both of you tonight, why are you right in the argument you make and 
+                your opponent wrong? And where do you think a Justice Barrett would take the court? President Trump, in 
+                this first segment, you go first. Two minutes.
+            </p>
+            <p>
+                <strong>TRUMP:</strong> Thank you very much, Chris. I will tell you very simply. We won the election. 
+                Elections have consequences. We have the Senate, we have the White House, and we have a phenomenal 
+                nominee respected by all. Top, top academic, good in every way. Good in every way. In fact, some of 
+                her biggest endorsers are very liberal people from Notre Dame and other places. So I think she’s going 
+                to be fantastic. We have plenty of time. Even if we did it after the election itself. I have a lot of 
+                time after the election, as you know. So I think that she will be outstanding. She’s going to be as 
+                good as anybody that has served on that court. We really feel that. We have a professor at Notre Dame, 
+                highly respected by all, said she’s the single greatest student he’s ever had. He’s been a professor 
+                for a long time at a great school.
+            </p>
+            <p>
+                And we won the election, and therefore we have the right to choose her, and very few people knowingly 
+                would say otherwise. And by the way, the Democrats, they wouldn’t even think about not doing it. 
+                The only difference is they’d try and do it faster. There’s no way they would give it up. They had 
+                Merrick Garland, but the problem is they didn’t have the election so they were stopped. And probably 
+                that would happen in reverse, also. Definitely would happen in reverse. So we won the election, and 
+                we have the right to do it, Chris.
+            </p>
+            <p>
+                Source: 
+                <a href="https://www.debates.org/voter-education/debate-transcripts/september-29-2020-debate-transcript/" 
+                    target="_blank">https://www.debates.org/voter-education/debate-transcripts/september-29-2020-debate-transcript/</a>
+            </p>
+            <p>
+                This segment from the presidential debate between Donald Trump and Joe Biden in 2020 demonstrates a 
+                complex argument involving the nomination of Amy Coney Barrett to the Supreme Court. What structure 
+                do we have here? Yes, none! Not so neatly as in the examples before, at least. We can indeed make 
+                out a modus ponens here, but would have to rearrange things:
+            </p>
+            <ol>
+                <li>(P1) If you win the election, you control the Senate and the White House.</li>
+                <li>(P2) If you control the Senate and the White House, you have the right to choose and confirm a Supreme Court Justice.</li>
+                <li>(P3) The Republicans (and Donald Trump) won the election.</li>
+                <li>(C1) The Republicans have the right to choose and confirm a Supreme Court Justice.</li>
+                <li>(P4) A good Supreme Court Justice is highly qualified and respected.</li>
+                <li>(P5) Amy Coney Barrett is a highly qualified nominee, respected by people across the political spectrum.</li>
+                <li>(C2) Amy Coney Barrett makes a good Supreme Court Justice.</li>
+                <li>(P6) It is not unprecedented or unconstitutional to confirm a Supreme Court nominee during an election year when the same political party controls the presidency and the Senate.</li>
+                <li>(P7) Democrats would have proceeded with the nomination of Merrick Garland if they had controlled the Senate in 2016.</li>
+                <li>(P8) The Republicans control the presidency and the Senate. (Equal to P2)</li>
+                <li>(C3) The Republicans and Trump have the right to choose and confirm Amy Coney Barrett for the Supreme Court.</li>
+            </ol>
+            <p>
+                This is just one way to reconstruct the argument. You could do it differently. 
+                The important part is to stick to the original as closely as possible and decide on which 
+                features of the argument you want to highlight. It's good practice to make arguments as 
+                strong as possible, even if you don't agree and want to tear it down. Because the stronger 
+                an opponent's argument, the more weight does your counterargument have. That's why I've 
+                tried my best to tickle out a strong logical structure that is easy to understand. 
+                Whether the argument holds up now depends on its soundness because the logical structure 
+                looks good. All the propositions that start with (P) could be right or wrong. The argument 
+                fails as soon as you can argue for the wrongness of one of the premises.
+            </p>                
+        </div>
+    </div>
+    <div class="lesson-navigation">
+        <div class="nav-button-container prev">
+            <button id="prev-btn">Previous</button>
+            <div id="prev-title" class="nav-title"></div>
+        </div>
+        <div class="nav-button-container next">
+            <div id="next-title" class="nav-title"></div>
+            <button id="next-btn">Next</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
