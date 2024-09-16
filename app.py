@@ -77,7 +77,7 @@ def register():
     cursor.execute( "SELECT * FROM users WHERE username = ?", (username,))
     rows = cursor.fetchall()
     if len(rows) > 0:
-        return error("User already exists", 400)
+        return error_handling("User already exists", 400)
     else:
         try:
             hash = generate_password_hash(password)
@@ -85,7 +85,7 @@ def register():
             connection.commit()
             return redirect("/login")
         except ValueError as e:
-            return error("User already exists", 400)
+            return error_handling("User already exists", 400)
         finally:
             cursor.close()
     
