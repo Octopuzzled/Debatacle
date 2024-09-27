@@ -28,10 +28,35 @@ document.addEventListener('DOMContentLoaded', function() {
         nextBtn.parentElement.style.visibility = currentPart < parts.length - 1 ? 'visible' : 'hidden';
     }
 
+    function saveProgress() {
+        // Assuming you're tracking the current lesson name and part number
+        const lessonName = content.dataset.lessonName;  // Assuming this is set in the HTML
+        const partNumber = currentPart;
+
+        // Make an AJAX request to save progress
+        fetch('/save_progress', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                lesson_name: lessonName,
+                last_page: partNumber
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Failed to save progress.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
     prevBtn.addEventListener('click', function() {
         if (currentPart > 0) {
             currentPart--;
             updateNavigation();
+            saveProgress();  // Save progress after navigating
         }
     });
 
@@ -39,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentPart < parts.length - 1) {
             currentPart++;
             updateNavigation();
+            saveProgress();  // Save progress after navigating
         }
     });
 

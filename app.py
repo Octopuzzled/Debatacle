@@ -3,7 +3,7 @@ from flask_session import Session
 import atexit
 from os import urandom
 from models import register_user, login_user
-from utils import create_password_hash, error_handling, valid_email
+from utils import create_password_hash, error_handling, valid_email, login_required
 from db_connection import connection
 import bcrypt
 
@@ -23,6 +23,33 @@ def close_db_connection():
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route('/home')
+@login_required
+def home():
+    user_id = session['user_id']
+
+    # Get user's last progress from the database
+    cursor = connection.cursor()
+    try:
+        progress = cursor.execute('''
+        SELECT lesson_name, last_page FROM user_progress
+        WHERE user_id = %s
+    ''', (user_id,)).fetchone()
+
+        if progress:
+            lesson_name = progress['lesson_name']
+            last_page = progress['last_page']
+        else:
+            lesson_name = None
+            last_page = None
+
+        return render_template('home.html', lesson_name=lesson_name, last_page=last_page)
+    except Exception as e:
+        error_handling("Error fetching your progress. Please contact admin.", 500)
+    finally:
+        cursor.close()
+    
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -110,12 +137,34 @@ def register():
     # User reached route via GET (just clicking link)
     else:
         return render_template("register.html")
-    
-    
+       
 @app.route("/logical-structures")
 def structures():
     return render_template("logical-structures.html")
 
+@app.route('/save_progress', methods=['POST'])
+@login_required
+def save_progress():
+    data = request.get_json()
+    user_id = session['user_id']
+    lesson_name = data['lesson_name']
+    last_page = data['last_page']
+
+    # Upsert the user's progress into the database
+    cursor = connection.cursor()
+    try:
+        cursor.execute('''
+        INSERT INTO user_progress (user_id, lesson_name, last_page)
+        VALUES (%s, %s, %s)
+        ON DUPLICATE KEY UPDATE last_page = %s
+    ''', (user_id, lesson_name, last_page, last_page))
+        connection.commit()
+        return '', 204  # No content response (success)
+    except Exception as e:
+        error_handling("Error saving progress. Please contact admin.", 500)
+    finally:
+        cursor.close()
+  
 @app.route("/start")
 def start():
     return render_template("start.html")
