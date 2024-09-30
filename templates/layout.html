@@ -58,6 +58,9 @@
                 <ul class="navbar-nav ms-auto">
                   {% if session.get('user_id') %}
                   <li class="nav-item">
+                    <a class="nav-link" href="/home">Home</a>
+                  </li>
+                  <li class="nav-item">
                     <a class="nav-link" href="/logout">Logout</a>
                   </li>
                   {% else %}

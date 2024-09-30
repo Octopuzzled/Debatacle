@@ -6,19 +6,13 @@ import bcrypt
 def login_user(username, password):
     # Query database for username
     cursor = connection.cursor()
-    cursor.execute("SELECT password_hash, salt, user_id FROM users WHERE username = %s", (username,))
+    cursor.execute("SELECT password_hash, user_id FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
     
     if user:
-        password_hash, salt, user_id = user
-
-        # Recreate the hashed password using the salt and check against stored hash
-        salted_password = password.encode()  # The raw password
-        hashed_password = bcrypt.hashpw(salted_password, password_hash.encode())
-        
+        stored_hash, user_id = user
         # Check if the provided password matches the stored hash
-        if hashed_password == password_hash.encode():
-            # Remember which user has logged in
+        if bcrypt.checkpw(password.encode(), stored_hash.encode()):
             session["user_id"] = user_id
             return redirect("/")  # Successful login
         else:
@@ -38,7 +32,7 @@ def register_user(username, email, salt, password_hash):
 
     # Store the salt and hashed password in your database
     try:
-        cursor.execute("INSERT INTO users (username, email, salt, password_hash) VALUES(%s, %s, %s, %s)", (username, email, salt, password_hash))
+        cursor.execute("INSERT INTO users (username, email, password_salt, password_hash) VALUES(%s, %s, %s, %s)", (username, email, salt, password_hash))
         connection.commit()
         return redirect("/login")
     except ValueError as e:

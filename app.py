@@ -1,11 +1,12 @@
-from flask import Flask, redirect, render_template, request, session
+from email.iterators import _structure
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_session import Session
 import atexit
-from os import urandom
 from models import register_user, login_user
 from utils import create_password_hash, error_handling, valid_email, login_required
 from db_connection import connection
-import bcrypt
+import mysql.connector
+from functools import wraps
 
 # Configure application
 app = Flask(__name__)
@@ -28,27 +29,38 @@ def index():
 @login_required
 def home():
     user_id = session['user_id']
-
-    # Get user's last progress from the database
-    cursor = connection.cursor()
+    
     try:
-        progress = cursor.execute('''
-        SELECT lesson_name, last_page FROM user_progress
-        WHERE user_id = %s
-    ''', (user_id,)).fetchone()
-
-        if progress:
-            lesson_name = progress['lesson_name']
-            last_page = progress['last_page']
-        else:
-            lesson_name = None
-            last_page = None
+        cursor = connection.cursor(dictionary=True, buffered=True)
+        
+        # Modified query to fetch the most recent progress without using updated_at
+        cursor.execute('''
+            SELECT lesson_name, last_page 
+            FROM user_progress
+            WHERE user_id = %s
+            ORDER BY last_page DESC  -- Assuming higher page numbers are more recent
+            LIMIT 1
+        ''', (user_id,))
+        
+        progress = cursor.fetchone()
+        
+        lesson_name = progress['lesson_name'] if progress else None
+        last_page = progress['last_page'] if progress else None
 
         return render_template('home.html', lesson_name=lesson_name, last_page=last_page)
+    
+    except mysql.connector.Error as e:
+        app.logger.error(f"Database error: {e}")
+        return render_template('home.html', error="An error occurred while fetching your progress. Please try again later."), 500
+    
     except Exception as e:
-        error_handling("Error fetching your progress. Please contact admin.", 500)
+        app.logger.error(f"Unexpected error: {e}")
+        return render_template('home.html', error="An unexpected error occurred. Please contact support if this persists."), 500
+    
     finally:
-        cursor.close()
+        if 'cursor' in locals():
+            cursor.close()
+        connection.commit()
     
 
 @app.route("/login", methods=["GET", "POST"])
@@ -117,10 +129,6 @@ def register():
             return error_handling("Password must be at least 8 characters long.", 400)
         if not valid_email(email):
             return error_handling("Please enter a valid email address", 400)
-
-        # Generate salt and hash the password
-        #salt = bcrypt.gensalt()
-        #hashed_password = bcrypt.hashpw(password, salt)
           
         # Hash the password using the salt
         hashed_password, salt = create_password_hash(password)
@@ -139,7 +147,7 @@ def register():
         return render_template("register.html")
        
 @app.route("/logical-structures")
-def structures():
+def logical_structure():
     return render_template("logical-structures.html")
 
 @app.route('/save_progress', methods=['POST'])
@@ -154,14 +162,21 @@ def save_progress():
     cursor = connection.cursor()
     try:
         cursor.execute('''
-        INSERT INTO user_progress (user_id, lesson_name, last_page)
-        VALUES (%s, %s, %s)
-        ON DUPLICATE KEY UPDATE last_page = %s
-    ''', (user_id, lesson_name, last_page, last_page))
-        connection.commit()
-        return '', 204  # No content response (success)
+            SELECT lesson_name, last_page 
+            FROM user_progress
+            WHERE user_id = %s
+            ORDER BY updated_at DESC
+            LIMIT 1
+        ''', (user_id,))
+        progress = cursor.fetchone()
+
+        lesson_name = progress['lesson_name'] if progress else None
+        last_page = progress['last_page'] if progress else None
+
+        return render_template('home.html', lesson_name=lesson_name, last_page=last_page)
     except Exception as e:
-        error_handling("Error saving progress. Please contact admin.", 500)
+        app.logger.error(f"Error fetching user progress: {str(e)}")
+        return render_template('home.html', error="An error occurred. Please try again later."), 500
     finally:
         cursor.close()
   
@@ -170,7 +185,7 @@ def start():
     return render_template("start.html")
 
 @app.route("/vocabulary", methods=["GET"])
-def vocab():
+def vocabulary():
     return render_template("vocabulary.html")
 
 

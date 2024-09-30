@@ -5,13 +5,13 @@
 {% endblock %}
 
 {% block main %}
-
-{% if lesson_name %}
-   <a href="{{ url_for(lesson_name) }}?part={{ last_page }}">
-       <button>Continue where you left off</button>
-   </a>
-   {% else %}
-   <p>You haven't started any lessons yet!</p>
-   {% endif %}
-
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% elif lesson_name %}
+        <a href="{{ url_for(lesson_name) }}?part={{ last_page }}">
+            <button>Continue where you left off</button>
+        </a>
+    {% else %}
+        <p>You haven't started any lessons yet!</p>
+    {% endif %}
 {% endblock %}
