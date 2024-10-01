@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevTitle = document.getElementById('prev-title');
     const nextTitle = document.getElementById('next-title');
     const currentTitle = document.getElementById('current-title');
-    let currentPart = 0;
+     // Get the initial part number from the server-rendered current_part
+     let currentPart = parseInt(content.dataset.currentPart, 10) || 0;
 
     function updateNavigation() {
         prevBtn.disabled = currentPart === 0;
@@ -26,14 +27,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         prevBtn.parentElement.style.visibility = currentPart > 0 ? 'visible' : 'hidden';
         nextBtn.parentElement.style.visibility = currentPart < parts.length - 1 ? 'visible' : 'hidden';
+
+         // Highlight the correct part based on currentPart
+         parts.forEach((part, index) => {
+            part.classList.toggle('active', index === currentPart);
+        });
     }
 
     function saveProgress() {
-        // Assuming you're tracking the current lesson name and part number
-        const lessonName = content.dataset.lessonName;  // Assuming this is set in the HTML
+        const lessonName = document.querySelector('.lesson-content').dataset.lessonName;
         const partNumber = currentPart;
-
-        // Make an AJAX request to save progress
+    
         fetch('/save_progress', {
             method: 'POST',
             headers: {
@@ -46,10 +50,16 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                console.error('Failed to save progress.');
+                throw new Error('Failed to save progress');
             }
+            return response.json();
         })
-        .catch(error => console.error('Error:', error));
+        .then(data => {
+            console.log('Progress saved successfully:', data.message);
+        })
+        .catch(error => {
+            console.error('Error saving progress:', error);
+        });
     }
 
     prevBtn.addEventListener('click', function() {

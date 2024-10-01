@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block main %}
-
 <div class="lesson-container">
     <div class="current-title" id="current-title"></div>
     <div class="lesson-content" data-lesson-name="vocabulary">
-        <div class="lesson-part" data-title="Introduction">
+
+        <div class="lesson-part" data-title="Introduction" {% if current_part == 0 %} class="active" {% endif %}>
             <p>Vocabulary you'll learn here:</p>
             <ul class="mx-auto">
                 <li>propositions and arguments</li>
@@ -18,25 +18,26 @@
                 <li>deductive and inductive</li>
             </ul>
         </div>
-        <div class="lesson-part" data-title="Aargument basics">        
+
+        <div class="lesson-part" data-title="Argument basics" {% if current_part == 1 %} class="active" {% endif %}>        
             <p>
                 Every time anyone wants to reasonably convince someone else, they give arguments. 
                 Reasons for why other people should believe them. We find that in science, politics 
-                and in our dayli life. But what is an argument? To get a first grasp, consider the 
+                and in our daily life. But what is an argument? To get a first grasp, consider the 
                 following two texts. One of them is an argument, the other is not. Can you spot the 
                 difference?
             </p>
             <p>
                 Example 1:
-            "Death Metal, along with Black and Thrash Metal, is a subgenre of extreme metal. 
-            Its sound is characterized by hard, often dissonant melodies played on low-tuned guitars 
-            and accompanied by fast drumming and guttural shouts."
+                "Death Metal, along with Black and Thrash Metal, is a subgenre of extreme metal. 
+                Its sound is characterized by hard, often dissonant melodies played on low-tuned guitars 
+                and accompanied by fast drumming and guttural shouts."
             </p>
             <p>
                 Example 2:
-            "Traffic jams are a common problem in many cities, and they are often caused by the 
-            high number of cars on the road. Therefore, one way to reduce traffic congestion is 
-            to encourage more people to use public transportation or carpool."
+                "Traffic jams are a common problem in many cities, and they are often caused by the 
+                high number of cars on the road. Therefore, one way to reduce traffic congestion is 
+                to encourage more people to use public transportation or carpool."
             </p>
             <p>
                 Example 1 and 2 are sequences of propositions, in which certain claims are made. 
@@ -54,7 +55,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Argument example">
+        <div class="lesson-part" data-title="Argument example" {% if current_part == 2 %} class="active" {% endif %}>
             <p>
                 Yeah, that's a mouthful, I know. So let's look closer at Example 2, shall we?<br>
                 "<span class="text-green">Traffic jams are a common problem in many cities</span>, 
@@ -64,22 +65,22 @@
             </p>
             <p>
                 You can see in green the premises. They just tell us something about the world: 
-            1. traffic jams are a problem, and
-            2. a frequent cause is too many cars on the road
-            What follows in this argument is the conclusion. The conclusion follows logically 
-            from the premises, meaning: if those statements are  true, then there is no other 
-            possibility but that the conclusion is also true. That's the claim at least. Part 
-            of looking at arguments is to figure out whether those premises are true and if 
-            the conclusion really follows. But yeah, I guess we can say, that if the problem 
-            is too many cars, then reducing the amount of cars would help. And we can achieve 
-            that if we "encourage more people to use public transportation or carpool."
+                1. traffic jams are a problem, and
+                2. a frequent cause is too many cars on the road.
+                What follows in this argument is the conclusion. The conclusion follows logically 
+                from the premises, meaning: if those statements are  true, then there is no other 
+                possibility but that the conclusion is also true. That's the claim at least. Part 
+                of looking at arguments is to figure out whether those premises are true and if 
+                the conclusion really follows. But yeah, I guess we can say, that if the problem 
+                is too many cars, then reducing the amount of cars would help. And we can achieve 
+                that if we "encourage more people to use public transportation or carpool."
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Arguments = cakes">
+        <div class="lesson-part" data-title="Arguments = cakes" {% if current_part == 3 %} class="active" {% endif %}>
             <p>
                 Neat, so now we know what an argument is. Just some propositions, where some have 
-                the job is to to support another proposition so that we gotta think that proposition 
+                the job is to support another proposition so that we gotta think that proposition 
                 is true, if the supporting ones are true. So in a way ... Creating an argument 
                 is like baking a cake! You need the right ingredients for it to work. Just as a cake
                 requires specific ingredients that combine together to make something delicious, an 
@@ -89,8 +90,9 @@
                 exceptions.
             </p>
         </div>
-        <div class="lesson-part" data-title="Indexical expressions">
-            <P>
+
+        <div class="lesson-part" data-title="Indexical expressions" {% if current_part == 4 %} class="active" {% endif %}>
+            <p>
                 The exception are indexical expressions, such as "I", "here", "today":
             </p>
             <p>
@@ -112,8 +114,8 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Good arguments">
-            <P>
+        <div class="lesson-part" data-title="Good arguments" {% if current_part == 5 %} class="active" {% endif %}>
+            <p>
                 Alright. We know what arguments are. But what distinguishes a good from a bad argument? 
                 After all, we could make some obviously bogus arguments right now: <br><br>
                 (1) Plains are mammals. <br>
@@ -139,8 +141,8 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Validity: 2 types">
-            <P>
+        <div class="lesson-part" data-title="Validity: 2 types" {% if current_part == 6 %} class="active" {% endif %}>
+            <p>
                 Now, technically, there are two forms of valid arguments. Deductive and inductive ones. 
                 Deductive valid arguments are like the Frankenstein argument or the plain argument. 
                 They must be true, if the conclusion logically follows from the premises. But you can 
@@ -162,7 +164,9 @@
                 with a lot of uncertainty and therefore frequently only can make statements about likelihood.
             </p>
         </div>
+
     </div>
+
     <div class="lesson-navigation">
         <div class="nav-button-container prev">
             <button id="prev-btn">Previous</button>
@@ -174,5 +178,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

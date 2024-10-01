@@ -7,6 +7,7 @@ from utils import create_password_hash, error_handling, valid_email, login_requi
 from db_connection import connection
 import mysql.connector
 from functools import wraps
+from flask import jsonify
 
 # Configure application
 app = Flask(__name__)
@@ -33,21 +34,39 @@ def home():
     try:
         cursor = connection.cursor(dictionary=True, buffered=True)
         
-        # Modified query to fetch the most recent progress without using updated_at
         cursor.execute('''
             SELECT lesson_name, last_page 
             FROM user_progress
             WHERE user_id = %s
-            ORDER BY last_page DESC  -- Assuming higher page numbers are more recent
+            ORDER BY last_page ASC
             LIMIT 1
         ''', (user_id,))
         
         progress = cursor.fetchone()
         
-        lesson_name = progress['lesson_name'] if progress else None
-        last_page = progress['last_page'] if progress else None
+        if progress:
+            lesson_name = progress['lesson_name']
+            last_page = progress['last_page']
+            
+            # Map the database lesson_name to the correct route function name
+            lesson_route_map = {
+                'logical-structures': 'logical_structures',
+                'vocabulary': 'vocabulary',
+                # Add other mappings as needed
+            }
+            
+            route_name = lesson_route_map.get(lesson_name)
+            if route_name:
+                continue_url = url_for(route_name, part=last_page)
+            else:
+                app.logger.error(f"No route found for lesson: {lesson_name}")
+                continue_url = None
+        else:
+            continue_url = None
+            lesson_name = None
+            last_page = None
 
-        return render_template('home.html', lesson_name=lesson_name, last_page=last_page)
+        return render_template('home.html', continue_url=continue_url, lesson_name=lesson_name, last_page=last_page)
     
     except mysql.connector.Error as e:
         app.logger.error(f"Database error: {e}")
@@ -147,38 +166,53 @@ def register():
         return render_template("register.html")
        
 @app.route("/logical-structures")
-def logical_structure():
-    return render_template("logical-structures.html")
+def logical_structures():
+    part = request.args.get('part', 0, type=int)
+    return render_template("logical-structures.html", current_part=part)
 
 @app.route('/save_progress', methods=['POST'])
 @login_required
 def save_progress():
     data = request.get_json()
-    user_id = session['user_id']
-    lesson_name = data['lesson_name']
-    last_page = data['last_page']
+    
+    # Debugging logs
+    app.logger.info(f"Received data: {data}")
 
-    # Upsert the user's progress into the database
-    cursor = connection.cursor()
+    lesson_name = data.get('lesson_name')
+    last_page = data.get('last_page')
+    user_id = session.get('user_id')
+
+    if not lesson_name or last_page is None or user_id is None:
+        app.logger.error(f"Invalid data: lesson_name={lesson_name}, last_page={last_page}, user_id={user_id}")
+        return jsonify({"error": "Invalid data"}), 400
+
     try:
+        cursor = connection.cursor()
+        # Debugging log to check if data is passed correctly
+        app.logger.info(f"Inserting/Updating progress for user {user_id}, lesson: {lesson_name}, page: {last_page}")
+
+        # Insert or update progress in database
         cursor.execute('''
-            SELECT lesson_name, last_page 
-            FROM user_progress
-            WHERE user_id = %s
-            ORDER BY updated_at DESC
-            LIMIT 1
-        ''', (user_id,))
-        progress = cursor.fetchone()
+            INSERT INTO user_progress (user_id, lesson_name, last_page)
+            VALUES (%s, %s, %s)
+            ON DUPLICATE KEY UPDATE last_page = VALUES(last_page)
+        ''', (user_id, lesson_name, last_page))
 
-        lesson_name = progress['lesson_name'] if progress else None
-        last_page = progress['last_page'] if progress else None
+        connection.commit()
 
-        return render_template('home.html', lesson_name=lesson_name, last_page=last_page)
+        app.logger.info(f"Progress saved successfully for user {user_id}")
+        return jsonify({"message": "Progress saved successfully"}), 200
+
+    except mysql.connector.Error as e:
+        app.logger.error(f"Database error: {e}")
+        return jsonify({"error": "Database error"}), 500
     except Exception as e:
-        app.logger.error(f"Error fetching user progress: {str(e)}")
-        return render_template('home.html', error="An error occurred. Please try again later."), 500
+        app.logger.error(f"Unexpected error: {e}")
+        return jsonify({"error": "Unexpected error"}), 500
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
+
   
 @app.route("/start")
 def start():
@@ -186,7 +220,8 @@ def start():
 
 @app.route("/vocabulary", methods=["GET"])
 def vocabulary():
-    return render_template("vocabulary.html")
+    part = request.args.get('part', 0, type=int)
+    return render_template("vocabulary.html", current_part=part)
 
 
 # Run the flask app
