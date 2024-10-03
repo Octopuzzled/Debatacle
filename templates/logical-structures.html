@@ -9,7 +9,7 @@
 <div class="lesson-container">
     <div class="current-title" id="current-title"></div>
     <div class="lesson-content" data-lesson-name="logical-structures">
-        <div class="lesson-part" data-title="Introduction">        
+        <div class="lesson-part" data-title="Introduction" id="slide-1">        
             <p>
                 Let's dive into some of the juicy logic stuff! What you're learning here is most 
                 useful when you have the arguments you want to look at in writing. But, the more 
@@ -37,7 +37,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Modus ponens">
+        <div class="lesson-part" data-title="Modus ponens" id="slide-2">
             <p>
                 To understand the Modus Ponens, look at the following argument. As you might have 
                 picked up in the previous lessons, we use P to indicate that something is a premise 
@@ -89,7 +89,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Necessary & sufficient">
+        <div class="lesson-part" data-title="Necessary and sufficient" id="slide-3">
             <p>
                 To better understand fallacies, let's add some more terminology to your repertoire. 
                 In this argument, if Ludwig didn't understand the word "cajón", he wouldn't be fluent in Spanish. 
@@ -108,7 +108,7 @@
                 
         </div>
 
-        <div class="lesson-part" data-title="Modus Tollens">
+        <div class="lesson-part" data-title="Modus Tollens" id="slide-4">
             <p>
                 We'll need the same terms to understand the structure of a Modus Tollens. This structure works with negation:
             </p>
@@ -167,7 +167,7 @@
 
         </div>
 
-        <div class="lesson-part" data-title="Reductio ad absurdum">
+        <div class="lesson-part" data-title="Reductio ad absurdum" id="slide-5">
             <p>
                 How about one last structure to give you a solid foundation?
             </p>
@@ -234,7 +234,7 @@
             </table>                
         </div>
 
-        <div class="lesson-part" data-title="Real life arguments are complicated">
+        <div class="lesson-part" data-title="Real life arguments are complicated" id="slide-6">
             <p>
                 Now, there are many more logical structures. If you want to dive deep into this topic, 
                 it's worth learning about them. But for casually analyzing your and others' arguments, y
@@ -328,5 +328,23 @@
         </div>
     </div>
 </div>
+
+{% if last_slide %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lastSlide = '{{ last_slide }}';
+            const slide = document.getElementById(lastSlide);
+            if (slide) {
+              slide.classList.add('active');
+              // Navigate to the correct slide
+              const slideId = slide.id;
+              const slideLink = document.querySelector(`a[href="#${slideId}"]`);
+              if (slideLink) {
+                slideLink.click();
+              }
+            }
+          });
+    </script>
+{% endif %}
 
 {% endblock %}

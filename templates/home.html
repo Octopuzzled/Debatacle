@@ -6,12 +6,12 @@
 
 {% block main %}
     {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
+    <div class="alert alert-danger">{{ error }}</div>
     {% elif continue_url %}
-        <a href="{{ continue_url }}">
-            <button>Continue where you left off</button>
-        </a>
+    <a href="{{ continue_url }}">
+        <button>Continue where you left off</button>
+    </a>
     {% else %}
-        <p>You haven't started any lessons yet!</p>
+    <p>You haven't started any lessons yet!</p>
     {% endif %}
 {% endblock %}

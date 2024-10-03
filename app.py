@@ -35,7 +35,7 @@ def home():
         cursor = connection.cursor(dictionary=True, buffered=True)
         
         cursor.execute('''
-            SELECT lesson_name, last_page 
+            SELECT lesson_name, last_page, last_slide 
             FROM user_progress
             WHERE user_id = %s
             ORDER BY last_page ASC
@@ -47,6 +47,7 @@ def home():
         if progress:
             lesson_name = progress['lesson_name']
             last_page = progress['last_page']
+            last_slide = progress['last_slide']
             
             # Map the database lesson_name to the correct route function name
             lesson_route_map = {
@@ -57,7 +58,7 @@ def home():
             
             route_name = lesson_route_map.get(lesson_name)
             if route_name:
-                continue_url = url_for(route_name, part=last_page)
+                continue_url = url_for(route_name, part=last_page) + f"#{last_slide}"
             else:
                 app.logger.error(f"No route found for lesson: {lesson_name}")
                 continue_url = None
@@ -65,8 +66,9 @@ def home():
             continue_url = None
             lesson_name = None
             last_page = None
+            last_slide = None
 
-        return render_template('home.html', continue_url=continue_url, lesson_name=lesson_name, last_page=last_page)
+        return render_template('home.html', continue_url=continue_url, lesson_name=lesson_name, last_page=last_page, last_slide=last_slide)
     
     except mysql.connector.Error as e:
         app.logger.error(f"Database error: {e}")
@@ -168,50 +170,44 @@ def register():
 @app.route("/logical-structures")
 def logical_structures():
     part = request.args.get('part', 0, type=int)
-    return render_template("logical-structures.html", current_part=part)
-
-@app.route('/save_progress', methods=['POST'])
-@login_required
-def save_progress():
-    data = request.get_json()
-    
-    # Debugging logs
-    app.logger.info(f"Received data: {data}")
-
-    lesson_name = data.get('lesson_name')
-    last_page = data.get('last_page')
-    user_id = session.get('user_id')
-
-    if not lesson_name or last_page is None or user_id is None:
-        app.logger.error(f"Invalid data: lesson_name={lesson_name}, last_page={last_page}, user_id={user_id}")
-        return jsonify({"error": "Invalid data"}), 400
+    slide = request.args.get('slide', None)
 
     try:
-        cursor = connection.cursor()
-        # Debugging log to check if data is passed correctly
-        app.logger.info(f"Inserting/Updating progress for user {user_id}, lesson: {lesson_name}, page: {last_page}")
-
-        # Insert or update progress in database
+        cursor = connection.cursor(dictionary=True, buffered=True)
         cursor.execute('''
-            INSERT INTO user_progress (user_id, lesson_name, last_page)
-            VALUES (%s, %s, %s)
-            ON DUPLICATE KEY UPDATE last_page = VALUES(last_page)
-        ''', (user_id, lesson_name, last_page))
+            SELECT last_slide
+            FROM user_progress
+            WHERE user_id = %s AND lesson_name = %s
+        ''', (session['user_id'], slide))
 
-        connection.commit()
+        progress = cursor.fetchone()
+        last_slide = progress['last_slide'] if progress else None
 
-        app.logger.info(f"Progress saved successfully for user {user_id}")
-        return jsonify({"message": "Progress saved successfully"}), 200
+        return render_template("logical-structures.html", current_part=part, last_slide=last_slide)
 
     except mysql.connector.Error as e:
         app.logger.error(f"Database error: {e}")
-        return jsonify({"error": "Database error"}), 500
-    except Exception as e:
-        app.logger.error(f"Unexpected error: {e}")
-        return jsonify({"error": "Unexpected error"}), 500
+        return render_template('logical-structures.html', error="An error occurred while fetching your progress. Please try again later."), 500
+
     finally:
-        if cursor:
+        if 'cursor' in locals():
             cursor.close()
+        connection.commit()
+
+@app.route('/save-progress', methods=['POST'])
+@login_required
+def save_progress():
+    data = request.json
+    connection.execute("INSERT OR REPLACE INTO user_progress (user_id, lesson_name, slide_id) VALUES (?, ?, ?)",
+               session["user_id"], data['lessonName'], data['slideId'])
+    return jsonify(success=True)
+
+@app.route('/get-progress/<lesson_name>')
+@login_required
+def get_progress(lesson_name):
+    progress = connection.execute("SELECT slide_id FROM user_progress WHERE user_id = ? AND lesson_name = ?",
+                          session["user_id"], lesson_name)
+    return jsonify(slideId=progress[0]['slide_id'] if progress else None)
 
   
 @app.route("/start")
