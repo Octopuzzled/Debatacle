@@ -1,13 +1,11 @@
-from email.iterators import _structure
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for, jsonify
 from flask_session import Session
+from flask_login import current_user
 import atexit
 from models import register_user, login_user
 from utils import create_password_hash, error_handling, valid_email, login_required
 from db_connection import connection
-import mysql.connector
-from functools import wraps
-from flask import jsonify
+
 
 # Configure application
 app = Flask(__name__)
@@ -22,68 +20,32 @@ Session(app)
 def close_db_connection():
     connection.close()
 
+
+
+# Routes for all the pages  
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route('/home')
-@login_required
+@app.route("/home", methods=["GET"])
 def home():
-    user_id = session['user_id']
-    
-    try:
-        cursor = connection.cursor(dictionary=True, buffered=True)
+    return render_template("home.html", current_user=current_user)
         
-        cursor.execute('''
-            SELECT lesson_name, last_page, last_slide 
-            FROM user_progress
-            WHERE user_id = %s
-            ORDER BY last_page ASC
-            LIMIT 1
-        ''', (user_id,))
-        
-        progress = cursor.fetchone()
-        
-        if progress:
-            lesson_name = progress['lesson_name']
-            last_page = progress['last_page']
-            last_slide = progress['last_slide']
-            
-            # Map the database lesson_name to the correct route function name
-            lesson_route_map = {
-                'logical-structures': 'logical_structures',
-                'vocabulary': 'vocabulary',
-                # Add other mappings as needed
-            }
-            
-            route_name = lesson_route_map.get(lesson_name)
-            if route_name:
-                continue_url = url_for(route_name, part=last_page) + f"#{last_slide}"
-            else:
-                app.logger.error(f"No route found for lesson: {lesson_name}")
-                continue_url = None
-        else:
-            continue_url = None
-            lesson_name = None
-            last_page = None
-            last_slide = None
+@app.route("/logical-structures")
+def logical_structures():
+    return render_template("logical-structures.html")
+  
+@app.route("/start")
+def start():
+    return render_template("start.html")
 
-        return render_template('home.html', continue_url=continue_url, lesson_name=lesson_name, last_page=last_page, last_slide=last_slide)
+@app.route("/vocabulary", methods=["GET"])
+def vocabulary():
+    return render_template("vocabulary.html")   
     
-    except mysql.connector.Error as e:
-        app.logger.error(f"Database error: {e}")
-        return render_template('home.html', error="An error occurred while fetching your progress. Please try again later."), 500
     
-    except Exception as e:
-        app.logger.error(f"Unexpected error: {e}")
-        return render_template('home.html', error="An unexpected error occurred. Please contact support if this persists."), 500
     
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        connection.commit()
-    
-
+# Routes for handling user accounts
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -166,59 +128,66 @@ def register():
     # User reached route via GET (just clicking link)
     else:
         return render_template("register.html")
-       
-@app.route("/logical-structures")
-def logical_structures():
-    part = request.args.get('part', 0, type=int)
-    slide = request.args.get('slide', None)
 
+
+
+# Routes for progress tracking of lessons for logged in users
+@app.route("/update_progress", methods=["POST"])
+def update_progress():
+    user_id = request.form["user_id"]
+    lesson_name = request.form["lesson_name"]
+    page_number = request.form["page_number"]
+    # Update the user_progress table
+    query = "UPDATE user_progress SET last_page = %s WHERE user_id = %s AND lesson_name = %s"
+    cursor = connection.cursor()
+    cursor.execute(query, (page_number, user_id, lesson_name))
+    connection.commit()
+    cursor.close()
+    return "Progress updated"
+
+@app.route("/get_progress", methods=["GET"])
+def get_progress():
+    user_id = request.args.get("user_id")
+    # Retrieve the user's progress for each lesson
+    query = "SELECT lesson_name, last_page FROM user_progress WHERE user_id = %s"
+    cursor = connection.cursor()
+    cursor.execute(query, (user_id,))
+    progress = cursor.fetchall()
+    cursor.close()
+    return jsonify([{"lesson_name": p[0], "last_page": p[1]} for p in progress])
+
+@app.route("/continue_lesson/<user_id>/<lesson_name>", methods=["GET"])
+def continue_lesson(user_id, lesson_name):
+    if not user_id:
+        return "Error: User ID is required", 400
+    
+    query = "SELECT last_page FROM user_progress WHERE user_id = %s AND lesson_name = %s"
     try:
-        cursor = connection.cursor(dictionary=True, buffered=True)
-        cursor.execute('''
-            SELECT last_slide
-            FROM user_progress
-            WHERE user_id = %s AND lesson_name = %s
-        ''', (session['user_id'], slide))
-
-        progress = cursor.fetchone()
-        last_slide = progress['last_slide'] if progress else None
-
-        return render_template("logical-structures.html", current_part=part, last_slide=last_slide)
-
-    except mysql.connector.Error as e:
-        app.logger.error(f"Database error: {e}")
-        return render_template('logical-structures.html', error="An error occurred while fetching your progress. Please try again later."), 500
-
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id, lesson_name))
+        user_progress = cursor.fetchone()
+        
+        if not user_progress:
+            return "Error: No progress found", 404
+        
+        return redirect(url_for("lesson_page", lesson_name=lesson_name, page_number=user_progress[0]))
     finally:
-        if 'cursor' in locals():
-            cursor.close()
-        connection.commit()
+        cursor.close()
 
-@app.route('/save-progress', methods=['POST'])
-@login_required
-def save_progress():
-    data = request.json
-    connection.execute("INSERT OR REPLACE INTO user_progress (user_id, lesson_name, slide_id) VALUES (?, ?, ?)",
-               session["user_id"], data['lessonName'], data['slideId'])
-    return jsonify(success=True)
-
-@app.route('/get-progress/<lesson_name>')
-@login_required
-def get_progress(lesson_name):
-    progress = connection.execute("SELECT slide_id FROM user_progress WHERE user_id = ? AND lesson_name = ?",
-                          session["user_id"], lesson_name)
-    return jsonify(slideId=progress[0]['slide_id'] if progress else None)
-
-  
-@app.route("/start")
-def start():
-    return render_template("start.html")
-
-@app.route("/vocabulary", methods=["GET"])
-def vocabulary():
-    part = request.args.get('part', 0, type=int)
-    return render_template("vocabulary.html", current_part=part)
-
+@app.route("/lesson/<lesson_name>/<int:page_number>", methods=["GET"])
+def lesson_page(lesson_name, page_number):
+    query = "SELECT content FROM lessons WHERE name = %s AND page_number = %s"
+    try:
+        cursor = connection.cursor()
+        cursor.execute(query, (lesson_name, page_number))
+        lesson_content = cursor.fetchone()
+        
+        if not lesson_content:
+            return "Error: Lesson not found", 404
+        
+        return render_template("lesson.html", lesson_content=lesson_content[0])
+    finally:
+        cursor.close()
 
 # Run the flask app
 if __name__ == "__main__":

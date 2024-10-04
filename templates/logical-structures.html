@@ -317,34 +317,13 @@
             </p>                
         </div>
     </div>
-    <div class="lesson-navigation">
-        <div class="nav-button-container prev">
-            <button id="prev-btn">Previous</button>
-            <div id="prev-title" class="nav-title"></div>
-        </div>
-        <div class="nav-button-container next">
-            <div id="next-title" class="nav-title"></div>
-            <button id="next-btn">Next</button>
+    <div>
+        <div class="lesson-navigation">
+            <div class="nav-button-container">
+                
+            </div>
         </div>
     </div>
 </div>
-
-{% if last_slide %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const lastSlide = '{{ last_slide }}';
-            const slide = document.getElementById(lastSlide);
-            if (slide) {
-              slide.classList.add('active');
-              // Navigate to the correct slide
-              const slideId = slide.id;
-              const slideLink = document.querySelector(`a[href="#${slideId}"]`);
-              if (slideLink) {
-                slideLink.click();
-              }
-            }
-          });
-    </script>
-{% endif %}
 
 {% endblock %}

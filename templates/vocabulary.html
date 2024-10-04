@@ -9,7 +9,7 @@
     <div class="current-title" id="current-title"></div>
     <div class="lesson-content" data-lesson-name="vocabulary">
 
-        <div class="lesson-part" data-title="Introduction" {% if current_part == 0 %} class="active" {% endif %}>
+        <div class="lesson-part" data-title="Introduction" id="slide-1">
             <p>Vocabulary you'll learn here:</p>
             <ul class="mx-auto">
                 <li>propositions and arguments</li>
@@ -19,7 +19,7 @@
             </ul>
         </div>
 
-        <div class="lesson-part" data-title="Argument basics" {% if current_part == 1 %} class="active" {% endif %}>        
+        <div class="lesson-part" data-title="Argument basics" id="slide-2">        
             <p>
                 Every time anyone wants to reasonably convince someone else, they give arguments. 
                 Reasons for why other people should believe them. We find that in science, politics 
@@ -55,7 +55,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Argument example" {% if current_part == 2 %} class="active" {% endif %}>
+        <div class="lesson-part" data-title="Argument example" id="slide-3">
             <p>
                 Yeah, that's a mouthful, I know. So let's look closer at Example 2, shall we?<br>
                 "<span class="text-green">Traffic jams are a common problem in many cities</span>, 
@@ -77,7 +77,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Arguments = cakes" {% if current_part == 3 %} class="active" {% endif %}>
+        <div class="lesson-part" data-title="Arguments = cakes" id="slide-4">
             <p>
                 Neat, so now we know what an argument is. Just some propositions, where some have 
                 the job is to support another proposition so that we gotta think that proposition 
@@ -91,7 +91,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Indexical expressions" {% if current_part == 4 %} class="active" {% endif %}>
+        <div class="lesson-part" data-title="Indexical expressions" id="slide-5">
             <p>
                 The exception are indexical expressions, such as "I", "here", "today":
             </p>
@@ -114,7 +114,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Good arguments" {% if current_part == 5 %} class="active" {% endif %}>
+        <div class="lesson-part" data-title="Good arguments" id="slide-6">
             <p>
                 Alright. We know what arguments are. But what distinguishes a good from a bad argument? 
                 After all, we could make some obviously bogus arguments right now: <br><br>
@@ -141,7 +141,7 @@
             </p>
         </div>
 
-        <div class="lesson-part" data-title="Validity: 2 types" {% if current_part == 6 %} class="active" {% endif %}>
+        <div class="lesson-part" data-title="Validity: 2 types" id="slide-7">
             <p>
                 Now, technically, there are two forms of valid arguments. Deductive and inductive ones. 
                 Deductive valid arguments are like the Frankenstein argument or the plain argument. 
@@ -168,14 +168,7 @@
     </div>
 
     <div class="lesson-navigation">
-        <div class="nav-button-container prev">
-            <button id="prev-btn">Previous</button>
-            <div id="prev-title" class="nav-title"></div>
-        </div>
-        <div class="nav-button-container next">
-            <div id="next-title" class="nav-title"></div>
-            <button id="next-btn">Next</button>
-        </div>
+        
     </div>
 </div>
 {% endblock %}

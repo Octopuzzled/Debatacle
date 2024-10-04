@@ -1,3 +1,4 @@
+/* No @import rules are used in this stylesheet */
 :root {
     --background-color: #262626; 
     --font-heading: "Space Grotesk", sans-serif;
@@ -9,10 +10,9 @@
     --medium: #87B3C1;
     --light: #99BDCA;
     --lightest: #C4D7E0;
+}
 
-  }
-
-  body {
+body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -166,12 +166,6 @@ footer {
 /* Responsive layout styles */
 @media (max-width: 767px) {
     .quick-start {
-      margin-bottom: 2rem;
+        margin-bottom: 20px;
     }
-  }
-  
-  @media (min-width: 768px) {
-    .why-debates, .quick-start {
-      padding: 1rem;
-    }
-  }
+}
