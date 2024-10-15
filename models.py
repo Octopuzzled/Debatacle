@@ -1,6 +1,6 @@
 from utils import error_handling
 from flask import redirect, session
-from db_connection import connection
+from db_connection import get_connection as connection
 import bcrypt
 
 def login_user(username, password):
