@@ -1,11 +1,9 @@
 from flask import Flask, redirect, render_template, request, session
 from flask_session import Session
 import atexit
-from os import urandom
 from models import register_user, login_user
 from utils import create_password_hash, error_handling, valid_email
 from db_connection import connection
-import bcrypt
 
 # Configure application
 app = Flask(__name__)

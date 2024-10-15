@@ -6,9 +6,11 @@ load_dotenv()
 user = os.getenv("MYSQL_USER")
 password = os.getenv("MYSQL_PASSWORD")
 
-connection = mysql.connector.connect(
-    host="localhost",
-    user=user,
-    password=password,
-    database="debatacle"
-)
+def make_connection():
+    connection = mysql.connector.connect(
+        host="localhost",
+        user=user,
+        password=password,
+        database="debatacle"
+    )
+    return connection

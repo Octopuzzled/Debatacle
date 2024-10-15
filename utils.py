@@ -1,7 +1,6 @@
-from flask import render_template
+from flask import render_template, redirect, session
 import re
 import bcrypt
-from flask import redirect, session
 from functools import wraps
 
 import bcrypt
