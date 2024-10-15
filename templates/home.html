@@ -4,12 +4,8 @@
     Homepage
 {% endblock %}
 
-{% block main %}
-    {% if current_user.is_authenticated %}
+{% block main %}    
         <a href="{{ url_for('continue_lesson', user_id=current_user.id, lesson_name='logical_structures') }}">
             <button>Continue where you left off</button>
         </a>
-    {% else %}
-        <p>Please log in to continue where you left off.</p>
-    {% endif %}
 {% endblock %}

@@ -4,7 +4,7 @@ from flask_login import current_user
 import atexit
 from models import register_user, login_user
 from utils import create_password_hash, error_handling, valid_email, login_required
-from db_connection import connection
+from db_connection import get_connection as connection
 
 
 # Configure application
@@ -28,6 +28,7 @@ def index():
     return render_template("index.html")
 
 @app.route("/home", methods=["GET"])
+@login_required
 def home():
     return render_template("home.html", current_user=current_user)
         

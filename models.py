@@ -1,27 +1,41 @@
 from utils import error_handling
-from flask import redirect, session
-from db_connection import connection
+from flask import redirect, session, jsonify
+from db_connection import get_connection
 import bcrypt
 
 def login_user(username, password):
-    # Query database for username
-    cursor = connection.cursor()
-    cursor.execute("SELECT password_hash, user_id FROM users WHERE username = %s", (username,))
-    user = cursor.fetchone()
-    
-    if user:
-        stored_hash, user_id = user
-        # Check if the provided password matches the stored hash
-        if bcrypt.checkpw(password.encode(), stored_hash.encode()):
-            session["user_id"] = user_id
-            return redirect("/")  # Successful login
-        else:
-            return None  # Invalid password
-    else:
-        return None  # User not found
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        if connection is None:
+            return jsonify({"error": "Failed to connect to database"}), 500
 
-def register_user(username, email, salt, password_hash):
+        cursor = connection.cursor()
+        cursor.execute("SELECT password_hash, user_id FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+        
+        if user:
+            stored_hash, user_id = user
+            if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
+                session["user_id"] = user_id
+                return redirect("/")  # Successful login
+            else:
+                return jsonify({"error": "Invalid password"}), 401  # Invalid password
+        else:
+            return jsonify({"error": "User not found"}), 404  # User not found
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+
+def register_user(username, email, password):
     # Check if user already exists
+    connection = get_connection()
+    if connection is None:
+            return error_handling("Failed to connect to database", 500)
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     rows = cursor.fetchall()
@@ -30,12 +44,15 @@ def register_user(username, email, salt, password_hash):
         cursor.close()
         return error_handling("User already exists", 400)
 
-    # Store the salt and hashed password in your database
+    # Generate salt and hash password
+    salt = bcrypt.gensalt()
+    password_hash = bcrypt.hashpw(password.encode(), salt)
+
     try:
-        cursor.execute("INSERT INTO users (username, email, password_salt, password_hash) VALUES(%s, %s, %s, %s)", (username, email, salt, password_hash))
+        cursor.execute("INSERT INTO users (username, email, password_hash) VALUES(%s, %s, %s)", (username, email, password_hash))
         connection.commit()
         return redirect("/login")
-    except ValueError as e:
+    except Exception as e:
         return error_handling("Error registering user", 400)
     finally:
         cursor.close()
