@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Homepage
+{% endblock %}
+
+{% block main %}
+
+    <div class="app-container">
+        <header>
+            <h1>Start learning!</h1>
+            <select id="lessonSelect">
+                <option value="">Select a Lesson</option>
+                <!-- Lesson options will be populated by JavaScript -->
+            </select>
+        </header>
+        <main>
+            <div id="slideContent" class="slide-content">
+                <!-- Slide content will be inserted here -->
+            </div>
+            <div class="navigation">
+                <button id="prevSlide">Previous</button>
+                <span id="slideNumber"></span>
+                <button id="nextSlide">Next</button>
+            </div>
+        </main>
+    </div>
+
+{% endblock %}

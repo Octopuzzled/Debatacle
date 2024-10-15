@@ -131,6 +131,24 @@ main.container {
     max-width: calc(100% - 100px); /* Adjust based on button width */
 }
 
+#lessonSelect {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.slide-content {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    min-height: 200px;
+    margin-bottom: 20px;
+}
+
+#slideNumber {
+    font-weight: bold;
+}
+
 button {
     padding: 10px 20px;
     font-size: 16px;

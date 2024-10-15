@@ -18,7 +18,12 @@ def login_user(username, password):
         if user:
             stored_hash, user_id = user
             if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
+                # Retrieve is_admin value
+                cursor.execute("SELECT is_admin FROM users WHERE username = %s", (username,))
+                is_admin = cursor.fetchone()[0]
+                
                 session["user_id"] = user_id
+                session["is_admin"] = is_admin  # Set is_admin value in the session
                 return redirect("/")  # Successful login
             else:
                 return jsonify({"error": "Invalid password"}), 401  # Invalid password

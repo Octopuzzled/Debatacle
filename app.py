@@ -3,8 +3,8 @@ from flask_session import Session
 from flask_login import current_user
 import atexit
 from models import register_user, login_user
-from utils import create_password_hash, error_handling, valid_email, login_required
-from db_connection import get_connection as connection
+from utils import create_password_hash, error_handling, is_admin, valid_email, login_required
+from db_connection import get_connection
 
 
 # Configure application
@@ -16,13 +16,64 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Close the db connection when application shuts down
-@atexit.register
-def close_db_connection():
-    connection.close()
+#@atexit.register
+#def close_db_connection():
+#    connection.close()
 
+# Routes for admin (adding content)
+@app.route('/admin')
+@is_admin
+def admin_panel():
+    return render_template('admin.html')
 
+@app.route('/admin/add_lesson', methods=['POST'])
+@is_admin
+def add_lesson():
+    lesson_name = request.form['lesson_name']
+    description = request.form['description']
+    
+    connection = get_connection()
+    if connection is None:
+        return "Database connection failed", 500
 
-# Routes for all the pages  
+    try:
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO lessons (lesson_name, description) VALUES (%s, %s)",
+                       (lesson_name, description))
+        connection.commit()
+        return redirect(url_for('admin_panel'))
+    except Exception as e:
+        return str(e), 500
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+@app.route('/admin/add_slide', methods=['POST'])
+@is_admin
+def add_slide():
+    lesson_id = request.form['lesson_id']
+    content = request.form['content']
+    slide_order = request.form['slide_order']
+    
+    connection = get_connection()
+    if connection is None:
+        return "Database connection failed", 500
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO slides (lesson_id, content, slide_order) VALUES (%s, %s, %s)",
+                       (lesson_id, content, slide_order))
+        connection.commit()
+        return redirect(url_for('admin_panel'))
+    except Exception as e:
+        return str(e), 500
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+# Routes for all the user pages  
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -31,6 +82,10 @@ def index():
 @login_required
 def home():
     return render_template("home.html", current_user=current_user)
+
+@app.route("/learn-logic")
+def learn():
+    return render_template("/learn-logic.html")
         
 @app.route("/logical-structures")
 def logical_structures():
@@ -133,62 +188,114 @@ def register():
 
 
 # Routes for progress tracking of lessons for logged in users
-@app.route("/update_progress", methods=["POST"])
-def update_progress():
-    user_id = request.form["user_id"]
-    lesson_name = request.form["lesson_name"]
-    page_number = request.form["page_number"]
-    # Update the user_progress table
-    query = "UPDATE user_progress SET last_page = %s WHERE user_id = %s AND lesson_name = %s"
-    cursor = connection.cursor()
-    cursor.execute(query, (page_number, user_id, lesson_name))
-    connection.commit()
-    cursor.close()
-    return "Progress updated"
+@app.route('/api/lessons')
+def get_lessons():
+    connection = get_connection()
+    if connection is None:
+        return jsonify({"error": "Database connection failed"}), 500
 
-@app.route("/get_progress", methods=["GET"])
-def get_progress():
-    user_id = request.args.get("user_id")
-    # Retrieve the user's progress for each lesson
-    query = "SELECT lesson_name, last_page FROM user_progress WHERE user_id = %s"
-    cursor = connection.cursor()
-    cursor.execute(query, (user_id,))
-    progress = cursor.fetchall()
-    cursor.close()
-    return jsonify([{"lesson_name": p[0], "last_page": p[1]} for p in progress])
-
-@app.route("/continue_lesson/<user_id>/<lesson_name>", methods=["GET"])
-def continue_lesson(user_id, lesson_name):
-    if not user_id:
-        return "Error: User ID is required", 400
-    
-    query = "SELECT last_page FROM user_progress WHERE user_id = %s AND lesson_name = %s"
     try:
-        cursor = connection.cursor()
-        cursor.execute(query, (user_id, lesson_name))
-        user_progress = cursor.fetchone()
-        
-        if not user_progress:
-            return "Error: No progress found", 404
-        
-        return redirect(url_for("lesson_page", lesson_name=lesson_name, page_number=user_progress[0]))
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT lesson_id, lesson_name FROM lessons")
+        lessons = cursor.fetchall()
+        return jsonify(lessons)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     finally:
-        cursor.close()
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
 
-@app.route("/lesson/<lesson_name>/<int:page_number>", methods=["GET"])
-def lesson_page(lesson_name, page_number):
-    query = "SELECT content FROM lessons WHERE name = %s AND page_number = %s"
+@app.route('/api/slides')
+def get_slides():
+    lesson_id = request.args.get('lesson_id')
+    if not lesson_id:
+        return jsonify({"error": "Lesson ID is required"}), 400
+
+    connection = get_connection()
+    if connection is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
     try:
-        cursor = connection.cursor()
-        cursor.execute(query, (lesson_name, page_number))
-        lesson_content = cursor.fetchone()
-        
-        if not lesson_content:
-            return "Error: Lesson not found", 404
-        
-        return render_template("lesson.html", lesson_content=lesson_content[0])
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT slide_id, content FROM slides WHERE lesson_id = %s ORDER BY slide_order", (lesson_id,))
+        slides = cursor.fetchall()
+        return jsonify(slides)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     finally:
-        cursor.close()
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+@app.route('/api/progress', methods=['GET', 'POST'])
+def handle_progress():
+    if request.method == 'POST':
+        data = request.json
+        user_id = 1  # Replace with actual user authentication
+        lesson_id = data.get('lesson_id')
+        slide_id = data.get('slide_id')
+
+        if not lesson_id or not slide_id:
+            return jsonify({"error": "Lesson ID and Slide ID are required"}), 400
+
+        connection = get_connection()
+        if connection is None:
+            return jsonify({"error": "Database connection failed"}), 500
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""
+                INSERT INTO user_progress (user_id, lesson_id, last_slide_id) 
+                VALUES (%s, %s, %s) 
+                ON DUPLICATE KEY UPDATE last_slide_id = %s
+            """, (user_id, lesson_id, slide_id, slide_id))
+            connection.commit()
+            return jsonify({"status": "success"})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+    else:  # GET request
+        user_id = 1  # Replace with actual user authentication
+
+        connection = get_connection()
+        if connection is None:
+            return jsonify({"error": "Database connection failed"}), 500
+
+        try:
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT lesson_id, last_slide_id FROM user_progress WHERE user_id = %s", (user_id,))
+            progress = cursor.fetchone()
+            return jsonify(progress) if progress else jsonify({})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+
+@app.route('/api/progress/<int:user_id>')
+def get_progress(user_id):
+    connection = get_connection()
+    if connection is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT last_slide_id FROM user_progress WHERE user_id = %s", (user_id,))
+        progress = cursor.fetchone()
+        if progress:
+            return jsonify({"lastSlideId": progress['last_slide_id']})
+        return jsonify({"lastSlideId": None})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
 
 # Run the flask app
 if __name__ == "__main__":

@@ -19,6 +19,21 @@ def create_password_hash(password):
 def error_handling(error_message, error_code):
     return render_template('error.html', error_message=error_message, error_code=error_code)
 
+def is_admin(f):
+    """
+    Decorate routes to require admin status.
+
+    https://flask.palletsprojects.com/en/latest/patterns/viewdecorators/
+    """
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("is_admin") != 1:
+            return redirect("/")
+        return f(*args, **kwargs)
+
+    return decorated_function
+
 def login_required(f):
     """
     Decorate routes to require login.
