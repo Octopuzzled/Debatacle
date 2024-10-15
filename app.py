@@ -3,7 +3,7 @@ from flask_session import Session
 import atexit
 from models import register_user, login_user
 from utils import create_password_hash, error_handling, valid_email
-from db_connection import connection
+from db_connection import get_connection
 
 # Configure application
 app = Flask(__name__)
@@ -12,6 +12,8 @@ app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+connection = get_connection()
 
 # Close the db connection when application shuts down
 @atexit.register
