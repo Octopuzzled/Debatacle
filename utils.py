@@ -3,6 +3,7 @@ import re
 import bcrypt
 from flask import redirect, session
 from functools import wraps
+from db_connection import get_connection
 
 import bcrypt
 
@@ -18,6 +19,28 @@ def create_password_hash(password):
 # Error handling
 def error_handling(error_message, error_code):
     return render_template('error.html', error_message=error_message, error_code=error_code)
+
+def get_user_progress(user_id):
+    connection = get_connection()
+    if connection is None:
+        return None
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT lesson_id, slide_order 
+            FROM user_progress 
+            WHERE user_id = %s
+            ORDER BY last_viewed DESC
+            LIMIT 1
+        """, (user_id,))
+        return cursor.fetchone()
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
 
 def is_admin(f):
     """

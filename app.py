@@ -3,8 +3,9 @@ from flask_session import Session
 from flask_login import current_user
 import atexit
 from models import register_user, login_user
-from utils import create_password_hash, error_handling, is_admin, valid_email, login_required
+from utils import create_password_hash, error_handling, is_admin, valid_email, login_required, get_user_progress
 from db_connection import get_connection
+import bleach
 
 
 # Configure application
@@ -53,7 +54,7 @@ def add_lesson():
 @is_admin
 def add_slide():
     lesson_id = request.form['lesson_id']
-    content = request.form['content']
+    content =  bleach.clean(request.form['content'])  # Sanitize HTML
     slide_order = request.form['slide_order']
     
     connection = get_connection()
@@ -81,11 +82,97 @@ def index():
 @app.route("/home", methods=["GET"])
 @login_required
 def home():
-    return render_template("home.html", current_user=current_user)
+    user_id = session["user_id"]
+    last_slide = None
+    all_lessons = []
 
-@app.route("/learn-logic")
-def learn():
-    return render_template("/learn-logic.html")
+    connection = get_connection()
+    if connection is None:
+        return render_template('home.html', error="Database connection failed"), 500
+
+    try:
+        with connection.cursor(dictionary=True) as cursor:
+            # Fetch the user's progress
+            cursor.execute("""
+                SELECT up.lesson_id, up.last_slide_id, l.lesson_name, s.slide_order
+                FROM user_progress up
+                JOIN lessons l ON up.lesson_id = l.lesson_id
+                JOIN slides s ON up.last_slide_id = s.slide_id
+                WHERE up.user_id = %s
+            """, (user_id,))
+            progress = cursor.fetchone()
+
+            if progress:
+                last_lesson = {
+                    'lesson_id': progress['lesson_id'],
+                    'lesson_name': progress['lesson_name'],
+                    'slide_id': progress['last_slide_id'],
+                    'slide_order': progress['slide_order']
+                }
+
+            # Fetch all lessons for progress display
+            cursor.execute("SELECT lesson_id, lesson_name FROM lessons ORDER BY lesson_id")
+            all_lessons = cursor.fetchall()
+
+    except Exception as e:
+        return render_template('home.html', error=f"An error occurred: {str(e)}"), 500
+
+    finally:
+        if connection.is_connected():
+            connection.close()
+
+    return render_template('home.html', last_lesson=last_lesson, all_lessons=all_lessons)
+        
+
+@app.route('/learn-logic/<int:lesson_id>/<int:slide_order>')
+def learn_logic(lesson_id, slide_order):
+    user_id = 1  # Replace this with actual user authentication logic
+    connection = get_connection()
+    if connection is None:
+        return render_template('learn-logic.html', error="Database connection failed"), 500
+
+    try:
+        with connection.cursor(dictionary=True) as cursor:
+            # Fetch lesson information
+            cursor.execute("SELECT lesson_name FROM lessons WHERE lesson_id = %s", (lesson_id,))
+            lesson = cursor.fetchone()
+            if not lesson:
+                return render_template('learn-logic.html', error="Lesson not found"), 404
+
+            # Fetch current slide
+            cursor.execute("""
+                SELECT slide_id, content
+                FROM slides
+                WHERE lesson_id = %s AND slide_order = %s
+            """, (lesson_id, slide_order))
+            slide = cursor.fetchone()
+            if not slide:
+                return render_template('learn-logic.html', error="Slide not found"), 404
+
+            # Get total number of slides for this lesson
+            cursor.execute("SELECT COUNT(*) as total FROM slides WHERE lesson_id = %s", (lesson_id,))
+            total_slides = cursor.fetchone()['total']
+
+            # Update user progress
+            cursor.execute("""
+                INSERT INTO user_progress (user_id, lesson_id, last_slide_id)
+                VALUES (%s, %s, %s)
+                ON DUPLICATE KEY UPDATE last_slide_id = %s
+            """, (user_id, lesson_id, slide['slide_id'], slide['slide_id']))
+            connection.commit()
+
+    except Exception as e:
+        return render_template('learn-logic.html', error=f"An error occurred: {str(e)}"), 500
+    finally:
+        if connection.is_connected():
+            connection.close()
+
+    return render_template('learn-logic.html',
+                           lesson_name=lesson['lesson_name'],
+                           lesson_id=lesson_id,
+                           slide=slide,
+                           slide_order=slide_order,
+                           total_slides=total_slides)
         
 @app.route("/logical-structures")
 def logical_structures():
@@ -296,6 +383,8 @@ def get_progress(user_id):
         if connection.is_connected():
             cursor.close()
             connection.close()
+
+# Routes to show progress on home.html
 
 # Run the flask app
 if __name__ == "__main__":

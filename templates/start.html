@@ -1,20 +1,33 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Homepage
+    {{ lesson_name }} - Slide {{ slide_order }}
 {% endblock %}
 
 {% block main %}
-
-<p>
-    Welcome to this little introduction to arguments and logic!
-</p>
-<p>
-    To get you started quickly, I've organized all information into levels. 
-    I suggest to start at level one and progress through the levels just like you would in a game. 
-    If you're revisiting the page, you can of course just continue where you left off. 
-    If you register for an account, you can also save your progress, letting this site 
-    do the remembering for you.
-</p>
-
+    <div class="app-container">
+        <header>
+            <h1>{{ lesson_name }}</h1>
+        </header>
+        <main>
+            <div id="slideContent" class="slide-content">
+                {{ slide.content|safe }}
+            </div>
+            <div class="navigation">
+                {% if slide_order > 1 %}
+                    <a href="{{ url_for('learn_logic', lesson_id=lesson_id, slide_order=slide_order-1) }}" class="btn">Previous</a>
+                {% else %}
+                    <button disabled>Previous</button>
+                {% endif %}
+                
+                <span id="slideNumber">Slide {{ slide_order }} of {{ total_slides }}</span>
+                
+                {% if slide_order < total_slides %}
+                    <a href="{{ url_for('learn_logic', lesson_id=lesson_id, slide_order=slide_order+1) }}" class="btn">Next</a>
+                {% else %}
+                    <button disabled>Next</button>
+                {% endif %}
+            </div>
+        </main>
+    </div>
 {% endblock %}
