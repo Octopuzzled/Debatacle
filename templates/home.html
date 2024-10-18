@@ -22,7 +22,7 @@
                         Continue "{{ last_lesson.lesson_name }}" (Slide {{ last_lesson.slide_order }})
                     </a>
                 {% elif all_lessons %}
-                    <a href="{{ url_for('learn_logic', lesson_id=all_lessons[0].lesson_id, slide_order=1) }}" 
+                    <a href="{{ url_for('learn_logic', lesson_id=all_lessons[0].lesson_id) }}" 
                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         Start the course
                     </a>
@@ -33,14 +33,14 @@
             
             {% if all_lessons %}
                 <div class="mt-8">
-                    <h2 class="text-2xl font-semibold mb-4">Your Progress</h2>
+                    <h2 class="text-2xl font-semibold mb-4">Course Lessons</h2>
                     <div class="space-y-4">
                         {% for lesson in all_lessons %}
                             <div class="flex items-center">
                                 <div class="w-8 h-8 rounded-full {% if last_lesson and lesson.lesson_id <= last_lesson.lesson_id %}bg-green-500{% else %}bg-gray-300{% endif %} flex items-center justify-center text-white font-bold mr-4">
                                     {{ loop.index }}
                                 </div>
-                                <a href="{{ url_for('learn_logic', lesson_id=lesson.lesson_id, slide_order=1) }}" class="text-lg text-blue-500 hover:underline">
+                                <a href="{{ url_for('learn_logic', lesson_id=lesson.lesson_id) }}" class="text-lg text-blue-500 hover:underline">
                                     {{ lesson.lesson_name }}
                                 </a>
                             </div>

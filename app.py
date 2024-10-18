@@ -124,9 +124,10 @@ def home():
     return render_template('home.html', last_lesson=last_lesson, all_lessons=all_lessons)
         
 
+@app.route('/learn-logic/<int:lesson_id>')
 @app.route('/learn-logic/<int:lesson_id>/<int:slide_order>')
-def learn_logic(lesson_id, slide_order):
-    user_id = 1  # Replace this with actual user authentication logic
+def learn_logic(lesson_id, slide_order=None):
+    user_id = session.get('user_id')  # Get user_id from session if logged in
     connection = get_connection()
     if connection is None:
         return render_template('learn-logic.html', error="Database connection failed"), 500
@@ -139,6 +140,26 @@ def learn_logic(lesson_id, slide_order):
             if not lesson:
                 return render_template('learn-logic.html', error="Lesson not found"), 404
 
+            # If slide_order is not provided, start from the beginning or last accessed slide
+            if slide_order is None:
+                if user_id:
+                    cursor.execute("""
+                        SELECT COALESCE(up.last_slide_id, (SELECT MIN(slide_id) FROM slides WHERE lesson_id = %s)) as slide_id
+                        FROM user_progress up
+                        WHERE up.user_id = %s AND up.lesson_id = %s
+                    """, (lesson_id, user_id, lesson_id))
+                    result = cursor.fetchone()
+                    slide_id = result['slide_id'] if result else None
+                else:
+                    cursor.execute("SELECT MIN(slide_id) as slide_id FROM slides WHERE lesson_id = %s", (lesson_id,))
+                    slide_id = cursor.fetchone()['slide_id']
+
+                if slide_id:
+                    cursor.execute("SELECT slide_order FROM slides WHERE slide_id = %s", (slide_id,))
+                    slide_order = cursor.fetchone()['slide_order']
+                else:
+                    slide_order = 1
+            
             # Fetch current slide
             cursor.execute("""
                 SELECT slide_id, content
@@ -153,13 +174,14 @@ def learn_logic(lesson_id, slide_order):
             cursor.execute("SELECT COUNT(*) as total FROM slides WHERE lesson_id = %s", (lesson_id,))
             total_slides = cursor.fetchone()['total']
 
-            # Update user progress
-            cursor.execute("""
-                INSERT INTO user_progress (user_id, lesson_id, last_slide_id)
-                VALUES (%s, %s, %s)
-                ON DUPLICATE KEY UPDATE last_slide_id = %s
-            """, (user_id, lesson_id, slide['slide_id'], slide['slide_id']))
-            connection.commit()
+            # Update user progress if logged in
+            if user_id:
+                cursor.execute("""
+                    INSERT INTO user_progress (user_id, lesson_id, last_slide_id)
+                    VALUES (%s, %s, %s)
+                    ON DUPLICATE KEY UPDATE last_slide_id = %s
+                """, (user_id, lesson_id, slide['slide_id'], slide['slide_id']))
+                connection.commit()
 
     except Exception as e:
         return render_template('learn-logic.html', error=f"An error occurred: {str(e)}"), 500
@@ -173,6 +195,25 @@ def learn_logic(lesson_id, slide_order):
                            slide=slide,
                            slide_order=slide_order,
                            total_slides=total_slides)
+    
+@app.route('/lessons')
+def lessons():
+    connection = get_connection()
+    if connection is None:
+        return render_template('lessons.html', error="Database connection failed"), 500
+
+    try:
+        with connection.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT lesson_id, lesson_name FROM lessons ORDER BY lesson_id")
+            all_lessons = cursor.fetchall()
+    except Exception as e:
+        return render_template('lessons.html', error=f"An error occurred: {str(e)}"), 500
+    finally:
+        if connection.is_connected():
+            connection.close()
+
+    return render_template('lessons.html', lessons=all_lessons)
+
         
 @app.route("/logical-structures")
 def logical_structures():
@@ -180,7 +221,7 @@ def logical_structures():
   
 @app.route("/start")
 def start():
-    return render_template("start.html")
+    return render_template("learn-logic.html")
 
 @app.route("/vocabulary", methods=["GET"])
 def vocabulary():
