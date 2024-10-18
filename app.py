@@ -140,7 +140,7 @@ def learn_logic(lesson_id, slide_order=None):
             if not lesson:
                 return render_template('learn-logic.html', error="Lesson not found"), 404
 
-            # If slide_order is not provided, start from the beginning or last accessed slide
+            # Determine slide order
             if slide_order is None:
                 if user_id:
                     cursor.execute("""
@@ -170,7 +170,7 @@ def learn_logic(lesson_id, slide_order=None):
             if not slide:
                 return render_template('learn-logic.html', error="Slide not found"), 404
 
-            # Get total number of slides for this lesson
+            # Get total number of slides
             cursor.execute("SELECT COUNT(*) as total FROM slides WHERE lesson_id = %s", (lesson_id,))
             total_slides = cursor.fetchone()['total']
 
@@ -195,6 +195,7 @@ def learn_logic(lesson_id, slide_order=None):
                            slide=slide,
                            slide_order=slide_order,
                            total_slides=total_slides)
+
     
 @app.route('/lessons')
 def lessons():
@@ -333,6 +334,31 @@ def get_lessons():
         if connection.is_connected():
             cursor.close()
             connection.close()
+            
+@app.route('/api/slide/<int:lesson_id>/<int:slide_order>')  # For JavaScript
+def get_slide(lesson_id, slide_order):
+    connection = get_connection()
+    if connection is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        with connection.cursor(dictionary=True) as cursor:
+            cursor.execute("""
+                SELECT content
+                FROM slides
+                WHERE lesson_id = %s AND slide_order = %s
+            """, (lesson_id, slide_order))
+            slide = cursor.fetchone()
+            
+            if not slide:
+                return jsonify({"error": "Slide not found"}), 404
+
+            return jsonify({"content": slide['content']})
+    except Exception as e:
+        return jsonify({"error": "An error occurred: " + str(e)}), 500
+    finally:
+        if connection.is_connected():
+            connection.close()
 
 @app.route('/api/slides')
 def get_slides():
@@ -358,9 +384,12 @@ def get_slides():
 
 @app.route('/api/progress', methods=['GET', 'POST'])
 def handle_progress():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
     if request.method == 'POST':
         data = request.json
-        user_id = 1  # Replace with actual user authentication
         lesson_id = data.get('lesson_id')
         slide_id = data.get('slide_id')
 
@@ -372,38 +401,35 @@ def handle_progress():
             return jsonify({"error": "Database connection failed"}), 500
 
         try:
-            cursor = connection.cursor()
-            cursor.execute("""
-                INSERT INTO user_progress (user_id, lesson_id, last_slide_id) 
-                VALUES (%s, %s, %s) 
-                ON DUPLICATE KEY UPDATE last_slide_id = %s
-            """, (user_id, lesson_id, slide_id, slide_id))
-            connection.commit()
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO user_progress (user_id, lesson_id, last_slide_id) 
+                    VALUES (%s, %s, %s) 
+                    ON DUPLICATE KEY UPDATE last_slide_id = %s
+                """, (user_id, lesson_id, slide_id, slide_id))
+                connection.commit()
             return jsonify({"status": "success"})
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An error occurred: " + str(e)}), 500
         finally:
             if connection.is_connected():
-                cursor.close()
                 connection.close()
     else:  # GET request
-        user_id = 1  # Replace with actual user authentication
-
         connection = get_connection()
         if connection is None:
             return jsonify({"error": "Database connection failed"}), 500
 
         try:
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute("SELECT lesson_id, last_slide_id FROM user_progress WHERE user_id = %s", (user_id,))
-            progress = cursor.fetchone()
-            return jsonify(progress) if progress else jsonify({})
+            with connection.cursor(dictionary=True) as cursor:
+                cursor.execute("SELECT lesson_id, last_slide_id FROM user_progress WHERE user_id = %s", (user_id,))
+                progress = cursor.fetchone()
+                return jsonify(progress) if progress else jsonify({})
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An error occurred: " + str(e)}), 500
         finally:
             if connection.is_connected():
-                cursor.close()
                 connection.close()
+
 
 @app.route('/api/progress/<int:user_id>')
 def get_progress(user_id):
@@ -425,7 +451,43 @@ def get_progress(user_id):
             cursor.close()
             connection.close()
 
-# Routes to show progress on home.html
+# Also for JS
+@app.route('/api/update-progress/<int:lesson_id>/<int:slide_order>', methods=['POST'])
+def update_progress(lesson_id, slide_order):
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
+    connection = get_connection()
+    if connection is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        with connection.cursor() as cursor:
+            # Get slide_id once
+            cursor.execute("""
+                SELECT slide_id FROM slides WHERE lesson_id = %s AND slide_order = %s
+            """, (lesson_id, slide_order))
+            slide = cursor.fetchone()
+
+            if not slide:
+                return jsonify({"error": "Slide not found"}), 404
+            
+            slide_id = slide['slide_id']
+            
+            cursor.execute("""
+                INSERT INTO user_progress (user_id, lesson_id, last_slide_id)
+                VALUES (%s, %s, %s)
+                ON DUPLICATE KEY UPDATE last_slide_id = %s
+            """, (user_id, lesson_id, slide_id, slide_id))
+            connection.commit()
+
+        return jsonify({"message": "Progress updated successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": "An error occurred: " + str(e)}), 500
+    finally:
+        if connection.is_connected():
+            connection.close()
 
 # Run the flask app
 if __name__ == "__main__":

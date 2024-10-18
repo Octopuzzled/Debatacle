@@ -14,20 +14,34 @@
                 {{ slide.content|safe }}
             </div>
             <div class="navigation">
-                {% if slide_order > 1 %}
-                    <a href="{{ url_for('learn_logic', lesson_id=lesson_id, slide_order=slide_order-1) }}" class="btn">Previous</a>
-                {% else %}
-                    <button disabled>Previous</button>
-                {% endif %}
-                
+                <button id="prevSlide" class="btn" {% if slide_order <= 1 %}disabled{% endif %}>Previous</button>
                 <span id="slideNumber">Slide {{ slide_order }} of {{ total_slides }}</span>
-                
-                {% if slide_order < total_slides %}
-                    <a href="{{ url_for('learn_logic', lesson_id=lesson_id, slide_order=slide_order+1) }}" class="btn">Next</a>
-                {% else %}
-                    <button disabled>Next</button>
-                {% endif %}
-            </div>
+                <button id="nextSlide" class="btn" {% if slide_order >= total_slides %}disabled{% endif %}>Next</button>
+            </div>            
         </main>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Debug: Log all variables
+        console.log('Template variables:', {
+            lesson_name: {{ lesson_name|tojson }},
+            lesson_id: {{ lesson_id|tojson }},
+            slide_order: {{ slide_order|tojson }},
+            total_slides: {{ total_slides|tojson }}
+        });
+
+        // Only set lessonData if all required variables are present
+        {% if lesson_id is defined and slide_order is defined and total_slides is defined %}
+            window.lessonData = {
+                lessonId: {{ lesson_id|tojson }},
+                currentSlide: {{ slide_order|tojson }},
+                totalSlides: {{ total_slides|tojson }}
+            };
+            console.log('lessonData set:', window.lessonData);
+        {% else %}
+            console.error('Missing required variables for lessonData');
+        {% endif %}
+    </script>
 {% endblock %}
