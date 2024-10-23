@@ -30,8 +30,10 @@ def admin_panel():
 @app.route('/admin/add_lesson', methods=['POST'])
 @is_admin
 def add_lesson():
+    # Get form data
     lesson_name = request.form['lesson_name']
     description = request.form['description']
+    total_slides = request.form['total_slides']  # Get total slides from the form
     
     connection = get_connection()
     if connection is None:
@@ -39,8 +41,12 @@ def add_lesson():
 
     try:
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO lessons (lesson_name, description) VALUES (%s, %s)",
-                       (lesson_name, description))
+        # Insert new lesson with total_slides
+        cursor.execute("""
+            INSERT INTO lessons (lesson_name, description, total_slides) 
+            VALUES (%s, %s, %s)
+        """, (lesson_name, description, total_slides))
+        
         connection.commit()
         return redirect(url_for('admin_panel'))
     except Exception as e:
@@ -49,6 +55,7 @@ def add_lesson():
         if connection.is_connected():
             cursor.close()
             connection.close()
+
 
 @app.route('/admin/add_slide', methods=['POST'])
 @is_admin
@@ -83,45 +90,64 @@ def index():
 @login_required
 def home():
     user_id = session["user_id"]
-    last_slide = None
-    all_lessons = []
-
     connection = get_connection()
-    if connection is None:
-        return render_template('home.html', error="Database connection failed"), 500
-
+    
     try:
         with connection.cursor(dictionary=True) as cursor:
-            # Fetch the user's progress
+            # Get user progress AND completion status for all lessons
             cursor.execute("""
-                SELECT up.lesson_id, up.last_slide_id, l.lesson_name, s.slide_order
-                FROM user_progress up
-                JOIN lessons l ON up.lesson_id = l.lesson_id
-                JOIN slides s ON up.last_slide_id = s.slide_id
-                WHERE up.user_id = %s
-            """, (user_id,))
-            progress = cursor.fetchone()
+                SELECT 
+                    l.lesson_id,
+                    l.lesson_name,
+                    l.total_slides,
+                    up.last_slide_id,
+                    s.slide_order as current_progress,
+                    CASE WHEN lc.completed_at IS NOT NULL 
+                         THEN TRUE ELSE FALSE END as is_completed
+                FROM lessons l
+                LEFT JOIN user_progress up 
+                    ON l.lesson_id = up.lesson_id 
+                    AND up.user_id = %s
+                LEFT JOIN slides s 
+                    ON up.last_slide_id = s.slide_id
+                LEFT JOIN lesson_completions lc 
+                    ON l.lesson_id = lc.lesson_id 
+                    AND lc.user_id = %s
+                ORDER BY l.lesson_id
+            """, (user_id, user_id))
+            
+            lessons = cursor.fetchall()
+            
+            # Calculate progress percentages
+            for lesson in lessons:
+                if lesson['current_progress'] and lesson['total_slides'] and lesson['total_slides'] > 0:
+                    lesson['progress_percent'] = round(
+                        (lesson['current_progress'] / lesson['total_slides']) * 100
+                    )
+                else:
+                    lesson['progress_percent'] = 0
+            # Debugging: Print progress percent to see the values
+            for lesson in lessons:
+                print(f"Lesson {lesson['lesson_id']}: Progress {lesson['progress_percent']}%")
 
-            if progress:
-                last_lesson = {
-                    'lesson_id': progress['lesson_id'],
-                    'lesson_name': progress['lesson_name'],
-                    'slide_id': progress['last_slide_id'],
-                    'slide_order': progress['slide_order']
-                }
 
-            # Fetch all lessons for progress display
-            cursor.execute("SELECT lesson_id, lesson_name FROM lessons ORDER BY lesson_id")
-            all_lessons = cursor.fetchall()
+            # Get last accessed lesson
+            last_lesson = next(
+                (lesson for lesson in lessons if lesson['last_slide_id']), 
+                None
+            )
 
+            return render_template(
+                'home.html', 
+                last_lesson=last_lesson, 
+                all_lessons=lessons
+            )
+                
     except Exception as e:
         return render_template('home.html', error=f"An error occurred: {str(e)}"), 500
-
     finally:
         if connection.is_connected():
             connection.close()
-
-    return render_template('home.html', last_lesson=last_lesson, all_lessons=all_lessons)
         
 
 @app.route('/learn-logic/<int:lesson_id>')
@@ -448,39 +474,43 @@ def update_progress(lesson_id, slide_order):
         return jsonify({"error": "User not logged in"}), 401
 
     connection = get_connection()
-    if connection is None:
-        return jsonify({"error": "Database connection failed"}), 500
-
     try:
         with connection.cursor(dictionary=True) as cursor:
-            # Get slide_id
+            # Get slide info and total slides
             cursor.execute("""
-                SELECT slide_id FROM slides 
-                WHERE lesson_id = %s AND slide_order = %s
-            """, (lesson_id, slide_order))
-            slide = cursor.fetchone()
-
-            if not slide:
-                return jsonify({"error": "Slide not found"}), 404
+                SELECT s.slide_id, 
+                       (SELECT COUNT(*) FROM slides WHERE lesson_id = %s) as total_slides
+                FROM slides s 
+                WHERE s.lesson_id = %s AND s.slide_order = %s
+            """, (lesson_id, lesson_id, slide_order))
+            result = cursor.fetchone()
             
-            slide_id = slide['slide_id']
+            if not result:
+                return jsonify({"error": "Slide not found"}), 404
             
             # Update progress
             cursor.execute("""
                 INSERT INTO user_progress (user_id, lesson_id, last_slide_id)
                 VALUES (%s, %s, %s)
                 ON DUPLICATE KEY UPDATE last_slide_id = %s
-            """, (user_id, lesson_id, slide_id, slide_id))
+            """, (user_id, lesson_id, result['slide_id'], result['slide_id']))
+            
+            # If this is the last slide, mark lesson as completed
+            if slide_order == result['total_slides']:
+                cursor.execute("""
+                    INSERT IGNORE INTO lesson_completions (user_id, lesson_id)
+                    VALUES (%s, %s)
+                """, (user_id, lesson_id))
+            
             connection.commit()
-
+            
             return jsonify({
                 "message": "Progress updated successfully",
-                "lesson_id": lesson_id,
-                "last_slide_id": slide_id,
-                "slide_order": slide_order
+                "is_completed": slide_order == result['total_slides']
             }), 200
+            
     except Exception as e:
-        return jsonify({"error": "An error occurred: " + str(e)}), 500
+        return jsonify({"error": str(e)}), 500
     finally:
         if connection.is_connected():
             connection.close()

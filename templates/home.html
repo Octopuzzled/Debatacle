@@ -13,45 +13,79 @@
                 {{ error }}
             </div>
         {% else %}
+            <!-- Continue Section -->
+            {% if last_lesson %}
             <div class="card mb-4">
                 <div class="card-body">
-                    <h2 class="card-title">Ready to continue learning?</h2>
-                    
-                    {% if last_lesson %}
-                        <a href="/learn-logic/{{ last_lesson.lesson_id }}/{{ last_lesson.slide_order }}" class="btn btn-primary">
-                            Continue "{{ last_lesson.lesson_name }}" (Slide {{ last_lesson.slide_order }})
+                    <h2 class="card-title h4">Continue Learning</h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="/learn-logic/{{ last_lesson.lesson_id }}/{{ last_lesson.current_progress }}" 
+                           class="btn btn-primary">
+                            Continue "{{ last_lesson.lesson_name }}" 
+                            (Slide {{ last_lesson.current_progress }})
                         </a>
-                    {% elif all_lessons %}
-                        <a href="/learn-logic/{{ all_lessons[0].lesson_id }}/1" class="btn btn-primary">
-                            Start the course
-                        </a>
-                    {% else %}
-                        <p class="alert alert-info">No lessons available at the moment.</p>
-                    {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="progress">
+                                <div class="progress-bar" 
+                                     role="progressbar" 
+                                     style="width: {{ last_lesson.progress_percent }}%"
+                                     aria-valuenow="{{ last_lesson.progress_percent }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    {{ last_lesson.progress_percent }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% endif %}
             
+            <!-- All Lessons -->
             {% if all_lessons %}
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="mb-0">Course Lessons</h2>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        {% for lesson in all_lessons %}
-                            <div class="list-group-item d-flex align-items-center">
-                                <span class="badge bg-primary me-3">
-                                    {{ loop.index }}
-                                </span>
-                                <span class="flex-grow-1">
-                                    {{ lesson.lesson_name }}
-                                </span>
-                                <a href="/learn-logic/{{ lesson.lesson_id }}/1" class="btn btn-outline-primary btn-sm">
-                                    Start Lesson
-                                </a>
-                            </div>
-                        {% endfor %}
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">Course Lessons</h2>
                 </div>
+                <div class="list-group list-group-flush">
+                    {% for lesson in all_lessons %}
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge {% if lesson.is_completed %}bg-success{% else %}bg-primary{% endif %}">
+                                {{ loop.index }}
+                            </span>
+                            <div class="flex-grow-1">
+                                <h3 class="h6 mb-1">{{ lesson.lesson_name }}</h3>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar {% if lesson.is_completed %}bg-success{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ lesson.progress_percent }}%"
+                                         aria-valuenow="{{ lesson.progress_percent }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            {% if lesson.is_completed %}
+                                <span class="badge bg-success me-2">
+                                    <i class="bi bi-check-circle"></i> Completed
+                                </span>
+                            {% endif %}
+                            <a href="/learn-logic/{{ lesson.lesson_id }}/{% if lesson.current_progress %}{{ lesson.current_progress }}{% else %}1{% endif %}" 
+                               class="btn btn-outline-primary btn-sm">
+                                {% if lesson.is_completed %}
+                                    Review Lesson
+                                {% elif lesson.current_progress %}
+                                    Continue
+                                {% else %}
+                                    Start Lesson
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
             {% endif %}
         {% endif %}
     </div>
