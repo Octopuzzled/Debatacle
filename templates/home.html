@@ -5,43 +5,48 @@
 {% endblock %}
 
 {% block main %}    
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6">Welcome to Your Educational Journey</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">Welcome to Your Educational Journey</h1>
         
         {% if error %}
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <span class="block sm:inline">{{ error }}</span>
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
             </div>
         {% else %}
-            <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                <p class="mb-4">Ready to continue learning?</p>
-                
-                {% if last_lesson %}
-                    <a href="{{ url_for('learn_logic', lesson_id=last_lesson.lesson_id, slide_order=last_lesson.slide_order) }}" 
-                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Continue "{{ last_lesson.lesson_name }}" (Slide {{ last_lesson.slide_order }})
-                    </a>
-                {% elif all_lessons %}
-                    <a href="{{ url_for('learn_logic', lesson_id=all_lessons[0].lesson_id) }}" 
-                       class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Start the course
-                    </a>
-                {% else %}
-                    <p>No lessons available at the moment.</p>
-                {% endif %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">Ready to continue learning?</h2>
+                    
+                    {% if last_lesson %}
+                        <a href="/learn-logic/{{ last_lesson.lesson_id }}/{{ last_lesson.slide_order }}" class="btn btn-primary">
+                            Continue "{{ last_lesson.lesson_name }}" (Slide {{ last_lesson.slide_order }})
+                        </a>
+                    {% elif all_lessons %}
+                        <a href="/learn-logic/{{ all_lessons[0].lesson_id }}/1" class="btn btn-primary">
+                            Start the course
+                        </a>
+                    {% else %}
+                        <p class="alert alert-info">No lessons available at the moment.</p>
+                    {% endif %}
+                </div>
             </div>
             
             {% if all_lessons %}
-                <div class="mt-8">
-                    <h2 class="text-2xl font-semibold mb-4">Course Lessons</h2>
-                    <div class="space-y-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Course Lessons</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
                         {% for lesson in all_lessons %}
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full {% if last_lesson and lesson.lesson_id <= last_lesson.lesson_id %}bg-green-500{% else %}bg-gray-300{% endif %} flex items-center justify-center text-white font-bold mr-4">
+                            <div class="list-group-item d-flex align-items-center">
+                                <span class="badge bg-primary me-3">
                                     {{ loop.index }}
-                                </div>
-                                <a href="{{ url_for('learn_logic', lesson_id=lesson.lesson_id) }}" class="text-lg text-blue-500 hover:underline">
+                                </span>
+                                <span class="flex-grow-1">
                                     {{ lesson.lesson_name }}
+                                </span>
+                                <a href="/learn-logic/{{ lesson.lesson_id }}/1" class="btn btn-outline-primary btn-sm">
+                                    Start Lesson
                                 </a>
                             </div>
                         {% endfor %}

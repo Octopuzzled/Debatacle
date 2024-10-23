@@ -1,47 +1,47 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    {{ lesson_name }} - Slide {{ slide_order }}
+    {{ lesson_name }} {% if slide_order %}- Slide {{ slide_order }}{% endif %}
 {% endblock %}
 
 {% block main %}
-    <div class="app-container">
-        <header>
-            <h1>{{ lesson_name }}</h1>
-        </header>
-        <main>
-            <div id="slideContent" class="slide-content">
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% else %}
+        <div class="container">
+            <h1 class="text-center mb-4">{{ lesson_name }}</h1>
+            
+            <div id="slideContent" class="slide-content mb-4">
                 {{ slide.content|safe }}
             </div>
-            <div class="navigation">
-                <button id="prevSlide" class="btn" {% if slide_order <= 1 %}disabled{% endif %}>Previous</button>
-                <span id="slideNumber">Slide {{ slide_order }} of {{ total_slides }}</span>
-                <button id="nextSlide" class="btn" {% if slide_order >= total_slides %}disabled{% endif %}>Next</button>
-            </div>            
-        </main>
-    </div>
-{% endblock %}
+            
+            <div class="navigation-controls text-center">
+                <button id="prevSlide" class="btn btn-primary" {% if slide_order <= 1 %}disabled{% endif %}>
+                    Previous
+                </button>
+                
+                <span id="slideNumber" class="mx-3">
+                    Slide {{ slide_order }} of {{ total_slides }}
+                </span>
+                
+                <button id="nextSlide" class="btn btn-primary" {% if slide_order >= total_slides %}disabled{% endif %}>
+                    Next
+                </button>
+            </div>
+        </div>
 
-{% block scripts %}
-    <script>
-        // Debug: Log all variables
-        console.log('Template variables:', {
-            lesson_name: {{ lesson_name|tojson }},
-            lesson_id: {{ lesson_id|tojson }},
-            slide_order: {{ slide_order|tojson }},
-            total_slides: {{ total_slides|tojson }}
-        });
-
-        // Only set lessonData if all required variables are present
-        {% if lesson_id is defined and slide_order is defined and total_slides is defined %}
-            window.lessonData = {
-                lessonId: {{ lesson_id|tojson }},
-                currentSlide: {{ slide_order|tojson }},
-                totalSlides: {{ total_slides|tojson }}
-            };
-            console.log('lessonData set:', window.lessonData);
-        {% else %}
-            console.error('Missing required variables for lessonData');
-        {% endif %}
-    </script>
+        {% block scripts %}
+            <script>
+                // Pass data from Flask to JavaScript
+                window.lessonData = {
+                    lessonId: {{ lesson_id }},
+                    currentSlide: {{ slide_order }},
+                    totalSlides: {{ total_slides }}
+                };
+            </script>
+            <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+        {% endblock %}
+    {% endif %}
 {% endblock %}
