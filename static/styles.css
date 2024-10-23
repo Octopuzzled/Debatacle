@@ -1,15 +1,15 @@
 /* No @import rules are used in this stylesheet */
 :root {
-    --background-color: #262626; 
+    --background-color: #213430; 
     --font-heading: "Space Grotesk", sans-serif;
     --font-gen: "Montserrat", sans-serif;
-    --text-bg: #C4D7E0; /* Light background for main content */
+    --text-bg: #f7f6f4; /* Light background for main content */
     /* Color palette */
-    --darkest: #00271C;
-    --dark: #236C74;
-    --medium: #87B3C1;
-    --light: #99BDCA;
-    --lightest: #C4D7E0;
+    --darkest: #27150B;
+    --dark: #28241B;
+    --medium: #D5B788;
+    --light: #f5e0bd;
+    --lightest: #f7f6f4;
 }
 
 body {
@@ -17,7 +17,7 @@ body {
     display: flex;
     flex-direction: column;
     font-family: var(--font-gen);
-    color: black;
+    background-color: var(--background-color);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -25,11 +25,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar {
-    background-color: rgba(--background-color, 0.8); /* Semi-transparent dark background */
+    background-color: rgba(--background-color);
+    color: var(--lightest);
 }
 
 .background-container {
-    background-image: url('blue-green.jpg');
+    background-image: url('logic3.png');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -37,15 +38,15 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
     text-shadow: 2px 2px 4px rgba(--background-color,0.5); /* Text shadow for better readability */
 }
 
 .background-container .fs-1 {
-    background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent background for text */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background for text */
     padding: 20px;
     border-radius: 10px;
     font-family: var(--font-heading);
+    color: var(--lightest);
 }
 
 main.container {
@@ -149,11 +150,11 @@ main.container {
     font-weight: bold;
 }
 
-button {
+button.btn {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    background-color: var(--darkest);
+    background-color: var(--dark);
     color: white;
     border: none;
     border-radius: 5px;
@@ -161,13 +162,14 @@ button {
     white-space: nowrap;
 }
 
-button:hover {
-    background-color: var(--dark);
+button.btn:hover {
+    background-color: var(--background-color);
 }
 
-button:disabled {
+button.btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    background-color: var(--medium);
 }
 
 footer {
