@@ -22,10 +22,43 @@ Session(app)
 #    connection.close()
 
 # Routes for admin (adding content)
-@app.route('/admin')
+@app.route('/admin', methods=['GET'])
 @is_admin
 def admin_panel():
-    return render_template('admin.html')
+    connection = get_connection()
+    if connection is None:
+        return "Database connection failed", 500
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+
+        # Fetch all lessons for dropdown and lesson management
+        cursor.execute("SELECT lesson_id, lesson_name, description, total_slides FROM lessons")
+        lessons = cursor.fetchall()
+
+        # Get selected lesson ID from query parameters
+        selected_lesson_id = request.args.get('lesson_id')
+        slides = []
+        selected_lesson = None
+
+        if selected_lesson_id:
+            # Fetch the selected lesson details
+            cursor.execute("SELECT * FROM lessons WHERE lesson_id = %s", (selected_lesson_id,))
+            selected_lesson = cursor.fetchone()
+
+            # Fetch slides for the selected lesson
+            cursor.execute("SELECT slide_id, content, slide_order FROM slides WHERE lesson_id = %s", (selected_lesson_id,))
+            slides = cursor.fetchall()
+
+        return render_template('admin.html', lessons=lessons, slides=slides, selected_lesson=selected_lesson)
+    
+    except Exception as e:
+        return str(e), 500
+    
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
 
 @app.route('/admin/add_lesson', methods=['POST'])
 @is_admin
@@ -80,6 +113,110 @@ def add_slide():
         if connection.is_connected():
             cursor.close()
             connection.close()
+            
+@app.route('/admin/edit_lesson/<int:lesson_id>', methods=['GET', 'POST'])
+@is_admin
+def edit_lesson(lesson_id):
+    connection = get_connection()
+    if connection is None:
+        return "Database connection failed", 500
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+
+        if request.method == 'POST':
+            lesson_name = request.form['lesson_name']
+            description = request.form['description']
+            total_slides = request.form['total_slides']
+            cursor.execute("""
+                UPDATE lessons
+                SET lesson_name = %s, description = %s, total_slides = %s
+                WHERE lesson_id = %s
+            """, (lesson_name, description, total_slides, lesson_id))
+            connection.commit()
+            return redirect(url_for('admin_panel'))
+
+        cursor.execute("SELECT * FROM lessons WHERE lesson_id = %s", (lesson_id,))
+        lesson = cursor.fetchone()
+        return render_template('edit_lesson.html', lesson=lesson)
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+
+@app.route('/admin/delete_lesson/<int:lesson_id>', methods=['GET'])
+@is_admin
+def delete_lesson(lesson_id):
+    connection = get_connection()
+    if connection is None:
+        return "Database connection failed", 500
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM lessons WHERE lesson_id=%s", (lesson_id,))
+        connection.commit()
+        return redirect(url_for('admin_panel'))
+    except Exception as e:
+        return str(e), 500
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+# Similar route for editing and deleting slides
+@app.route('/admin/edit_slide/<int:slide_id>', methods=['GET', 'POST'])
+@is_admin
+def edit_slide(slide_id):
+    connection = get_connection()
+    if connection is None:
+        return "Database connection failed", 500
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+
+        if request.method == 'POST':
+            content = request.form['content']
+            slide_order = request.form['slide_order']
+            cursor.execute("""
+                UPDATE slides
+                SET content = %s, slide_order = %s
+                WHERE slide_id = %s
+            """, (content, slide_order, slide_id))
+            connection.commit()
+            return redirect(url_for('admin_panel', lesson_id=request.form['lesson_id']))
+
+        cursor.execute("SELECT * FROM slides WHERE slide_id = %s", (slide_id,))
+        slide = cursor.fetchone()
+        return render_template('edit_slide.html', slide=slide)
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+
+
+@app.route('/admin/delete_slide/<int:slide_id>', methods=['GET'])
+@is_admin
+def delete_slide(slide_id):
+    connection = get_connection()
+    if connection is None:
+        return "Database connection failed", 500
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM slides WHERE slide_id=%s", (slide_id,))
+        connection.commit()
+        return redirect(url_for('admin_panel'))
+    except Exception as e:
+        return str(e), 500
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
 
 # Routes for all the user pages  
 @app.route("/")
@@ -231,7 +368,7 @@ def lessons():
 
     try:
         with connection.cursor(dictionary=True) as cursor:
-            cursor.execute("SELECT lesson_id, lesson_name FROM lessons ORDER BY lesson_id")
+            cursor.execute("SELECT lesson_id, lesson_name, description FROM lessons ORDER BY lesson_id")
             all_lessons = cursor.fetchall()
     except Exception as e:
         return render_template('lessons.html', error=f"An error occurred: {str(e)}"), 500

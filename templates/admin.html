@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Homepage
+    Admin Panel
 {% endblock %}
 
 {% block main %}
-
 <div class="container">
     <h1 class="mt-4">Admin Panel</h1>
-    
-    <h2>Add a New Lesson</h2>
+
+    <!-- Section to Add a New Lesson -->
+    <h2 class="mt-4">Add a New Lesson</h2>
     <form action="{{ url_for('add_lesson') }}" method="POST">
         <div class="form-group">
             <label for="lesson_name">Lesson Name</label>
@@ -20,28 +20,104 @@
             <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
         </div>
         <div class="form-group">
-            <label for="total_slides">Amount of slides</label>
-            <input type="number" class="form-control" id="lesson_name" name="total_slides" required>
+            <label for="total_slides">Amount of Slides</label>
+            <input type="number" class="form-control" id="total_slides" name="total_slides" required>
         </div>
         <button type="submit" class="btn btn-primary">Add Lesson</button>
     </form>
 
-    <h2 class="mt-4">Add a New Slide</h2>
-    <form action="{{ url_for('add_slide') }}" method="POST">
-        <div class="form-group">
-            <label for="lesson_id">Lesson ID</label>
-            <input type="number" class="form-control" id="lesson_id" name="lesson_id" required>
-        </div>
-        <div class="form-group">
-            <label for="content">Slide Content</label>
-            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
-        </div>
-        <div class="form-group">
-            <label for="slide_order">Slide Order</label>
-            <input type="number" class="form-control" id="slide_order" name="slide_order" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Add Slide</button>
-    </form>
-</div>
+    <!-- Section to View and Edit Existing Lessons -->
+    <h2 class="mt-4">Edit Existing Lessons</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Total Slides</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lesson in lessons %}
+            <tr>
+                <td>{{ lesson['lesson_id'] }}</td>
+                <td>{{ lesson['lesson_name'] }}</td>
+                <td>{{ lesson['description'] | safe }}</td>
+                <td>{{ lesson['total_slides'] }}</td>
+                <td>
+                    <a href="{{ url_for('edit_lesson', lesson_id=lesson['lesson_id']) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{{ url_for('delete_lesson', lesson_id=lesson['lesson_id']) }}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
+    <!-- Dropdown to Select a Lesson for Viewing/Adding Slides -->
+    <h2 class="mt-4">Select a Lesson to View/Add/Edit Slides</h2>
+    <form action="{{ url_for('admin_panel') }}" method="GET">
+        <div class="form-group">
+            <label for="lesson_id">Select Lesson</label>
+            <select class="form-control" id="lesson_id" name="lesson_id" onchange="this.form.submit()">
+                <option value="" disabled selected>Select a lesson</option>
+                {% for lesson in lessons %}
+                <option value="{{ lesson['lesson_id'] }}"
+                        {% if selected_lesson and selected_lesson['lesson_id'] == lesson['lesson_id'] %}selected{% endif %}>
+                    {{ lesson['lesson_name'] }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    {% if selected_lesson %}
+        <!-- Section to Add a New Slide for the Selected Lesson -->
+        <h2 class="mt-4">Add a New Slide to {{ selected_lesson['lesson_name'] }}</h2>
+        <form action="{{ url_for('add_slide') }}" method="POST">
+            <input type="hidden" name="lesson_id" value="{{ selected_lesson['lesson_id'] }}">
+            <div class="form-group">
+                <label for="content">Slide Content</label>
+                <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="slide_order">Slide Order</label>
+                <input type="number" class="form-control" id="slide_order" name="slide_order" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Slide</button>
+        </form>
+
+        <!-- Section to View and Edit Slides for the Selected Lesson -->
+        <h2 class="mt-4">Slides for {{ selected_lesson['lesson_name'] }}</h2>
+        {% if slides %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Content</th>
+                    <th>Order</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for slide in slides %}
+                <tr>
+                    <td>{{ slide['slide_id'] }}</td>
+                    <td>{{ slide['content'] | safe }}</td>
+                    <td>{{ slide['slide_order'] }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_slide', slide_id=slide['slide_id']) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ url_for('delete_slide', slide_id=slide['slide_id']) }}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No slides available for this lesson.</p>
+        {% endif %}
+    {% else %}
+        <p>Please select a lesson to view its slides.</p>
+    {% endif %}
+</div>
 {% endblock %}

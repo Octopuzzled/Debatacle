@@ -10,6 +10,7 @@
     --medium: #D5B788;
     --light: #f5e0bd;
     --lightest: #f7f6f4;
+    --accent: #9f441e;
 }
 
 body {
@@ -22,6 +23,14 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
+}
+
+a {
+    color: var(--accent);
+}
+
+a:hover {
+    color: var(--background-color);
 }
 
 .navbar {
