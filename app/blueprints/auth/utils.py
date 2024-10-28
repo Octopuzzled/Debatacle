@@ -1,7 +1,38 @@
 from utils import error_handling
 from flask import redirect, session, jsonify
-from db_connection import get_connection
+from app.db_connection import get_connection
 import bcrypt
+
+def create_password_hash(password):
+    # Generate a salt using bcrypt
+    salt = bcrypt.gensalt()
+    # Hash the password using bcrypt with the generated salt
+    hashed_password = bcrypt.hashpw(password.encode(), salt)
+    return hashed_password.decode(), salt.decode()
+
+def login_required(f):
+    """
+    Decorate routes to require login.
+    """
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") is None:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
+
+def is_admin(f):
+    """
+    Decorate routes to require admin status.
+    """
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("is_admin") != 1:
+            return redirect("/")
+        return f(*args, **kwargs)
+    return decorated_function
 
 def login_user(username, password):
     connection = None
