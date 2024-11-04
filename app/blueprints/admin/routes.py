@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from utils import is_admin, error_handling
-from app.db_connection import get_connection
+from blueprints.auth.utils import is_admin
+from utils.error_handling import error_handling
+from app.db_connection import get_connection, close_connection
 import logging
 import bleach
 
@@ -49,41 +50,51 @@ def admin_panel():
 @admin_bp.route('/admin/add_lesson', methods=['POST'])
 @is_admin
 def add_lesson():
-    lesson_name = request.form['lesson_name']
-    description = request.form['description']
-    total_slides = request.form['total_slides']
-    
+    lesson_name = request.form.get('lesson_name')
+    description = request.form.get('description')
+    total_slides = request.form.get('total_slides')
+
+    # Validate input
+    if not lesson_name or not description or not total_slides:
+        return error_handling("All fields are required.", 400)
+
     connection = get_connection()
     if connection is None:
-        return "Database connection failed", 500
+        return error_handling("Database connection failed.", 500)
 
+    cursor = None
     try:
         cursor = connection.cursor()
         cursor.execute("""
             INSERT INTO lessons (lesson_name, description, total_slides) 
-            VALUES (%s, %s, %s
-                    """, (lesson_name, description, total_slides))
+            VALUES (%s, %s, %s)
+        """, (lesson_name, description, total_slides))
         
         connection.commit()
         return redirect(url_for('admin.admin_panel'))
     except Exception as e:
-        return str(e), 500
+        return error_handling(str(e), 500)
     finally:
-        if connection.is_connected():
+        if cursor:
             cursor.close()
-            connection.close()
+        close_connection(connection) 
 
 @admin_bp.route('/admin/add_slide', methods=['POST'])
 @is_admin
 def add_slide():
-    lesson_id = request.form['lesson_id']
-    content = bleach.clean(request.form['content'])  # Sanitize HTML
-    slide_order = request.form['slide_order']
-    
+    lesson_id = request.form.get('lesson_id')
+    content = bleach.clean(request.form.get('content'))  # Sanitize HTML
+    slide_order = request.form.get('slide_order')
+
+    # Validate input
+    if not lesson_id or not content or not slide_order:
+        return error_handling("All fields are required.", 400)
+
     connection = get_connection()
     if connection is None:
-        return "Database connection failed", 500
+        return error_handling("Database connection failed.", 500)
 
+    cursor = None
     try:
         cursor = connection.cursor()
         cursor.execute("INSERT INTO slides (lesson_id, content, slide_order) VALUES (%s, %s, %s)",
@@ -91,26 +102,32 @@ def add_slide():
         connection.commit()
         return redirect(url_for('admin.admin_panel'))
     except Exception as e:
-        return str(e), 500
+        return error_handling(str(e), 500)
     finally:
-        if connection.is_connected():
+        if cursor:
             cursor.close()
-            connection.close()
+        close_connection(connection)  # Use the close_connection function here
 
 @admin_bp.route('/admin/edit_lesson/<int:lesson_id>', methods=['GET', 'POST'])
 @is_admin
 def edit_lesson(lesson_id):
     connection = get_connection()
     if connection is None:
-        return "Database connection failed", 500
+        return error_handling("Database connection failed.", 500)
 
+    cursor = None
     try:
         cursor = connection.cursor(dictionary=True)
 
         if request.method == 'POST':
-            lesson_name = request.form['lesson_name']
-            description = request.form['description']
-            total_slides = request.form['total_slides']
+            lesson_name = request.form.get('lesson_name')
+            description = request.form.get('description')
+            total_slides = request.form.get('total_slides')
+
+            # Validate input
+            if not lesson_name or not description or not total_slides:
+                return error_handling("All fields are required.", 400)
+
             cursor.execute("""
                 UPDATE lessons
                 SET lesson_name = %s, description = %s, total_slides = %s
@@ -123,43 +140,52 @@ def edit_lesson(lesson_id):
         lesson = cursor.fetchone()
         return render_template('edit_lesson.html', lesson=lesson)
 
+    except Exception as e:
+        return error_handling(str(e), 500)
     finally:
-        if connection.is_connected():
+        if cursor:
             cursor.close()
-            connection.close()
+        close_connection(connection)  # Use the close_connection function here
 
 @admin_bp.route('/admin/delete_lesson/<int:lesson_id>', methods=['GET'])
 @is_admin
 def delete_lesson(lesson_id):
     connection = get_connection()
     if connection is None:
-        return "Database connection failed", 500
+        return error_handling("Database connection failed.", 500)
 
+    cursor = None
     try:
         cursor = connection.cursor()
         cursor.execute("DELETE FROM lessons WHERE lesson_id=%s", (lesson_id,))
         connection.commit()
         return redirect(url_for('admin.admin_panel'))
     except Exception as e:
-        return str(e), 500
+        return error_handling(str(e), 500)
     finally:
-        if connection.is_connected():
+        if cursor:
             cursor.close()
-            connection.close()
+        close_connection(connection)  # Use the close_connection function here
 
 @admin_bp.route('/admin/edit_slide/<int:slide_id>', methods=['GET', 'POST'])
 @is_admin
 def edit_slide(slide_id):
     connection = get_connection()
     if connection is None:
-        return "Database connection failed", 500
+        return error_handling("Database connection failed.", 500)
 
+    cursor = None
     try:
         cursor = connection.cursor(dictionary=True)
 
         if request.method == 'POST':
-            content = request.form['content']
-            slide_order = request.form['slide_order']
+            content = request.form.get('content')
+            slide_order = request.form.get('slide_order')
+
+            # Validate input
+            if content is None or slide_order is None:
+                return error_handling("Content and slide order are required.", 400)
+
             cursor.execute("""
                 UPDATE slides
                 SET content = %s, slide_order = %s
@@ -172,26 +198,29 @@ def edit_slide(slide_id):
         slide = cursor.fetchone()
         return render_template('edit_slide.html', slide=slide)
 
+    except Exception as e:
+        return error_handling(str(e), 500)
     finally:
-        if connection.is_connected():
+        if cursor:
             cursor.close()
-            connection.close()
+        close_connection(connection)  # Use the close_connection function here
 
 @admin_bp.route('/admin/delete_slide/<int:slide_id>', methods=['GET'])
 @is_admin
 def delete_slide(slide_id):
     connection = get_connection()
     if connection is None:
-        return "Database connection failed", 500
+        return error_handling("Database connection failed.", 500)
 
+    cursor = None
     try:
         cursor = connection.cursor()
         cursor.execute("DELETE FROM slides WHERE slide_id=%s", (slide_id,))
         connection.commit()
         return redirect(url_for('admin.admin_panel'))
     except Exception as e:
-        return str(e), 500
+        return error_handling(str(e), 500)
     finally:
-        if connection.is_connected():
+        if cursor:
             cursor.close()
-            connection.close()
+        close_connection(connection)  # Use the close_connection function here

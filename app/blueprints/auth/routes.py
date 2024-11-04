@@ -1,5 +1,7 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for
-from utils import error_handling, valid_email, create_password_hash
+from flask import Blueprint, render_template, request, session, redirect
+from utils.error_handling import error_handling
+from utils.validation import valid_email
+from blueprints.auth.utils import  create_password_hash
 from auth.utils import login_user, register_user
 
 auth_bp = Blueprint('auth', __name__)
