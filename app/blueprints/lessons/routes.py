@@ -1,11 +1,8 @@
+from . import lessons_bp
 from flask import Blueprint, render_template, session
 from app.db_connection import get_connection
 
 lessons_bp = Blueprint('lessons', __name__)
-
-@lessons_bp.route("/")
-def index():
-    return render_template("index.html")
 
 @lessons_bp.route('/lessons')
 def lessons():

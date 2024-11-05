@@ -1,4 +1,4 @@
-from utils import error_handling
+from app.utils import error_handling
 from flask import redirect, session, jsonify
 from app.db_connection import get_connection
 import bcrypt

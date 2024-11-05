@@ -1,3 +1,4 @@
+from . import slides_bp
 from flask import Blueprint, jsonify, request, session
 from app.db_connection import get_connection
 

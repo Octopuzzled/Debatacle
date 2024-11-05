@@ -1,6 +1,8 @@
+from . import admin_bp
 from flask import Blueprint, render_template, request, redirect, url_for
-from blueprints.auth.utils import is_admin
-from utils.error_handling import error_handling
+from app.blueprints.auth.utils import is_admin
+from app.db_connection import get_connection, close_connection
+from app.utils.error_handling import error_handling
 from app.db_connection import get_connection, close_connection
 import logging
 import bleach

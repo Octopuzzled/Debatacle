@@ -1,6 +1,7 @@
+from . import dashboard_bp
 from flask import Blueprint, render_template, session
 from app.db_connection import get_connection
-from blueprints.auth import  login_required
+from app.blueprints.auth.utils import login_required
 
 
 dashboard_bp = Blueprint('dashboard', __name__)
