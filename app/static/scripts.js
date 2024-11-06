@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSlideOrder = currentSlide;
 
   function updateSlide(newSlideOrder) {
-      fetch(`/api/slide/${lessonId}/${newSlideOrder}`)
+      fetch(`/slides/api/slide/${lessonId}/${newSlideOrder}`)
           .then(response => {
               if (!response.ok) {
                   throw new Error(`HTTP error! status: ${response.status}`);
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
               nextButton.disabled = newSlideOrder >= totalSlides;
 
               // Update the URL without reloading the page
-              history.pushState(null, '', `/learn-logic/${lessonId}/${newSlideOrder}`);
+              history.pushState(null, '', `/lessons/learn-logic/${lessonId}/${newSlideOrder}`);
 
               // Update current slide order
               currentSlideOrder = newSlideOrder;
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function updateProgress(slideOrder) {
-      fetch(`/api/update-progress/${lessonId}/${slideOrder}`, { method: 'POST' })
+      fetch(`/slides/api/update-progress/${lessonId}/${slideOrder}`, { method: 'POST' })
           .then(response => {
               if (!response.ok) {
                   throw new Error(`HTTP error! status: ${response.status}`);

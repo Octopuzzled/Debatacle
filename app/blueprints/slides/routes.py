@@ -4,27 +4,30 @@ from app.db_connection import get_connection
 
 slides_bp = Blueprint('slides', __name__)
 
-@slides_bp.route('/api/slides')
-def get_slides():
-    lesson_id = request.args.get('lesson_id')
-    if not lesson_id:
-        return jsonify({"error": "Lesson ID is required"}), 400
-
+@slides_bp.route('/api/slide/<int:lesson_id>/<int:slide_order>')
+def get_slide(lesson_id, slide_order):
     connection = get_connection()
     if connection is None:
         return jsonify({"error": "Database connection failed"}), 500
 
     try:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT slide_id, content FROM slides WHERE lesson_id = %s ORDER BY slide_order", (lesson_id,))
-        slides = cursor.fetchall()
-        return jsonify(slides)
+        cursor.execute("""
+            SELECT slide_id, content
+            FROM slides
+            WHERE lesson_id = %s AND slide_order = %s
+        """, (lesson_id, slide_order))
+        slide = cursor.fetchone()
+        if not slide:
+            return jsonify({"error": "Slide not found"}), 404
+        return jsonify(slide)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
         if connection.is_connected():
             cursor.close()
             connection.close()
+
 
 @slides_bp.route('/api/update-progress/<int:lesson_id>/<int:slide_order>', methods=['POST'])
 def update_progress(lesson_id, slide_order):
