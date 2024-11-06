@@ -2,6 +2,8 @@ from flask import Flask
 from flask_session import Session
 from logging.handlers import RotatingFileHandler
 import logging
+from dotenv import load_dotenv
+import os
 
 # Import blueprints
 from app.blueprints.main.routes import main_bp
@@ -14,8 +16,11 @@ from app.blueprints.auth.routes import auth_bp
 from app.blueprints.dashboard.routes import dashboard_bp
 
 def create_app():
+    load_dotenv
     app = Flask(__name__)
 
+    app.secret_key = os.environ.get('SECRET_KEY')
+    
     # Configure logging for debugging
     handler = RotatingFileHandler('app.log', maxBytes=5 * 1024 * 1024, backupCount=5)  # 5 MB per file, keep 5 backups
     handler.setLevel(logging.ERROR)  # Set the logging level

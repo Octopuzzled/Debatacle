@@ -58,22 +58,22 @@
                   <ul class="navbar-nav ms-auto">
                     {% if session.get('user_id') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/home">Home</a>
+                            <a class="nav-link" href="{{ url_for('dashboard.home') }}">Home</a>
                         </li>
                         {% if session.get('is_admin') == 1 %}  <!-- Check if the user is an admin -->
                             <li class="nav-item">
-                                <a class="nav-link" href="/admin">Admin Panel</a>
+                                <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">Admin Panel</a>
                             </li>
                         {% endif %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">Logout</a>
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Login</a>
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/register">Register</a>
+                            <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
                         </li>
                     {% endif %}
                 </ul>

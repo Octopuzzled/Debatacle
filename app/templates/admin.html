@@ -10,7 +10,7 @@
 
     <!-- Section to Add a New Lesson -->
     <h2 class="mt-4">Add a New Lesson</h2>
-    <form action="{{ url_for('add_lesson') }}" method="POST">
+    <form action="{{ url_for('admin.add_lesson') }}" method="POST">
         <div class="form-group">
             <label for="lesson_name">Lesson Name</label>
             <input type="text" class="form-control" id="lesson_name" name="lesson_name" required>
@@ -46,8 +46,8 @@
                 <td>{{ lesson['description'] | safe }}</td>
                 <td>{{ lesson['total_slides'] }}</td>
                 <td>
-                    <a href="{{ url_for('edit_lesson', lesson_id=lesson['lesson_id']) }}" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="{{ url_for('delete_lesson', lesson_id=lesson['lesson_id']) }}" class="btn btn-danger btn-sm">Delete</a>
+                    <a href="{{ url_for('admin.edit_lesson', lesson_id=lesson['lesson_id']) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{{ url_for('admin.delete_lesson', lesson_id=lesson['lesson_id']) }}" class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
             {% endfor %}
@@ -56,7 +56,7 @@
 
     <!-- Dropdown to Select a Lesson for Viewing/Adding Slides -->
     <h2 class="mt-4">Select a Lesson to View/Add/Edit Slides</h2>
-    <form action="{{ url_for('admin_panel') }}" method="GET">
+    <form action="{{ url_for('admin.admin_panel') }}" method="GET">
         <div class="form-group">
             <label for="lesson_id">Select Lesson</label>
             <select class="form-control" id="lesson_id" name="lesson_id" onchange="this.form.submit()">
@@ -74,7 +74,7 @@
     {% if selected_lesson %}
         <!-- Section to Add a New Slide for the Selected Lesson -->
         <h2 class="mt-4">Add a New Slide to {{ selected_lesson['lesson_name'] }}</h2>
-        <form action="{{ url_for('add_slide') }}" method="POST">
+        <form action="{{ url_for('admin.add_slide') }}" method="POST">
             <input type="hidden" name="lesson_id" value="{{ selected_lesson['lesson_id'] }}">
             <div class="form-group">
                 <label for="content">Slide Content</label>
@@ -106,8 +106,8 @@
                     <td>{{ slide['content'] | safe }}</td>
                     <td>{{ slide['slide_order'] }}</td>
                     <td>
-                        <a href="{{ url_for('edit_slide', slide_id=slide['slide_id']) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{{ url_for('delete_slide', slide_id=slide['slide_id']) }}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="{{ url_for('admin.edit_slide', slide_id=slide['slide_id']) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ url_for('admin.delete_slide', slide_id=slide['slide_id']) }}" class="btn btn-danger btn-sm">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, redirect
+from flask import Blueprint, render_template, request, session, redirect, url_for
 from . import auth_bp
 from app.utils.error_handling import error_handling
 from app.utils.validation import valid_email
@@ -25,12 +25,16 @@ def login():
         
         login_result = login_user(username, password)
         
-        if login_result:
-            return login_result
+        if login_result and isinstance(login_result, dict):
+            # Set session variables
+            session["user_id"] = login_result["user_id"]
+            session["is_admin"] = login_result["is_admin"]
+            return redirect(url_for('main.index'))  # Adjust 'main.index' to your actual home route
         else:
             return error_handling("Invalid username or password", 403)
-    else:
-        return render_template("login.html")
+    
+    # GET request
+    return render_template("login.html")
 
 @auth_bp.route("/logout", methods=["GET", "POST"])
 def logout():

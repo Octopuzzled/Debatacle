@@ -49,7 +49,7 @@ def admin_panel():
         if connection and connection.is_connected():
             connection.close()
 
-@admin_bp.route('/admin/add_lesson', methods=['POST'])
+@admin_bp.route('/add_lesson', methods=['POST'])
 @is_admin
 def add_lesson():
     lesson_name = request.form.get('lesson_name')
@@ -81,7 +81,7 @@ def add_lesson():
             cursor.close()
         close_connection(connection) 
 
-@admin_bp.route('/admin/add_slide', methods=['POST'])
+@admin_bp.route('/add_slide', methods=['POST'])
 @is_admin
 def add_slide():
     lesson_id = request.form.get('lesson_id')
@@ -110,7 +110,7 @@ def add_slide():
             cursor.close()
         close_connection(connection)  # Use the close_connection function here
 
-@admin_bp.route('/admin/edit_lesson/<int:lesson_id>', methods=['GET', 'POST'])
+@admin_bp.route('/edit_lesson/<int:lesson_id>', methods=['GET', 'POST'])
 @is_admin
 def edit_lesson(lesson_id):
     connection = get_connection()
@@ -149,7 +149,7 @@ def edit_lesson(lesson_id):
             cursor.close()
         close_connection(connection)  # Use the close_connection function here
 
-@admin_bp.route('/admin/delete_lesson/<int:lesson_id>', methods=['GET'])
+@admin_bp.route('/delete_lesson/<int:lesson_id>', methods=['GET'])
 @is_admin
 def delete_lesson(lesson_id):
     connection = get_connection()
@@ -169,7 +169,7 @@ def delete_lesson(lesson_id):
             cursor.close()
         close_connection(connection)  # Use the close_connection function here
 
-@admin_bp.route('/admin/edit_slide/<int:slide_id>', methods=['GET', 'POST'])
+@admin_bp.route('/edit_slide/<int:slide_id>', methods=['GET', 'POST'])
 @is_admin
 def edit_slide(slide_id):
     connection = get_connection()
@@ -207,7 +207,7 @@ def edit_slide(slide_id):
             cursor.close()
         close_connection(connection)  # Use the close_connection function here
 
-@admin_bp.route('/admin/delete_slide/<int:slide_id>', methods=['GET'])
+@admin_bp.route('/delete_slide/<int:slide_id>', methods=['GET'])
 @is_admin
 def delete_slide(slide_id):
     connection = get_connection()

@@ -19,10 +19,8 @@
                 <div class="card-body">
                     <h2 class="card-title h4">Continue Learning</h2>
                     <div class="d-flex align-items-center gap-3">
-                        <a href="/learn-logic/{{ last_lesson.lesson_id }}/{{ last_lesson.current_progress }}" 
-                           class="btn btn-primary">
-                            Continue "{{ last_lesson.lesson_name }}" 
-                            (Slide {{ last_lesson.current_progress }})
+                        <a href="{{ url_for('lessons.learn_logic', lesson_id=last_lesson.lesson_id, slide_order=last_lesson.current_progress) }}" class="btn btn-primary">
+                            Continue "{{ last_lesson.lesson_name }}" (Slide {{ last_lesson.current_progress }})
                         </a>
                         <div class="flex-grow-1">
                             <div class="progress">
@@ -71,8 +69,8 @@
                                     <i class="bi bi-check-circle"></i> Completed
                                 </span>
                             {% endif %}
-                            <a href="/learn-logic/{{ lesson.lesson_id }}/{% if lesson.current_progress %}{{ lesson.current_progress }}{% else %}1{% endif %}" 
-                               class="btn btn-outline-primary btn-sm">
+                            <a href="{{ url_for('lessons.learn_logic', lesson_id=lesson.lesson_id, slide_order=lesson.current_progress or 1) }}" 
+                                class="btn btn-outline-primary btn-sm">
                                 {% if lesson.is_completed %}
                                     Review Lesson
                                 {% elif lesson.current_progress %}

@@ -40,7 +40,7 @@ def login_user(username, password):
     try:
         connection = get_connection()
         if connection is None:
-            return jsonify({"error": "Failed to connect to database"}), 500
+            return False
 
         cursor = connection.cursor()
         cursor.execute("SELECT password_hash, user_id FROM users WHERE username = %s", (username,))
@@ -53,19 +53,22 @@ def login_user(username, password):
                 cursor.execute("SELECT is_admin FROM users WHERE username = %s", (username,))
                 is_admin = cursor.fetchone()[0]
                 
-                session["user_id"] = user_id
-                session["is_admin"] = is_admin  # Set is_admin value in the session
-                return redirect("/")  # Successful login
-            else:
-                return jsonify({"error": "Invalid password"}), 401  # Invalid password
-        else:
-            return jsonify({"error": "User not found"}), 404  # User not found
+                # Return successful login data instead of redirecting
+                return {
+                    "success": True,
+                    "user_id": user_id,
+                    "is_admin": is_admin
+                }
+        return False
 
     except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        print(f"Login error: {str(e)}")  # For debugging
+        return False
     finally:
         if cursor:
             cursor.close()
+        if connection:
+            connection.close()
 
 def register_user(username, email, password):
     # Check if user already exists
