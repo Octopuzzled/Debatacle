@@ -15,15 +15,15 @@
         {% else %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for lesson in lessons %}
-                    <a href="{{ url_for('lessons.learn_logic', lesson_id=lesson.lesson_id) }}" 
-                       class="shadow-md rounded px-8 py-6 block hover:shadow-lg transition-shadow duration-300">
-                        <h2 class="text-xl font-semibold mb-2">{{ lesson.lesson_name }}</h2>
-                    </a>
+                    <div class="shadow-md rounded px-8 py-6 block hover:shadow-lg transition-shadow duration-300">
+                        <a href="{{ url_for('lessons.learn_logic', lesson_id=lesson.lesson_id) }}" class="block">
+                            <h2 class="text-xl font-semibold mb-2">{{ lesson.lesson_name }}</h2>
+                        </a>
                         <p>{{ lesson.description | safe }}</p>
-                    <a href="{{ url_for('lessons.learn_logic', lesson_id=lesson.lesson_id) }}" 
-                        class="shadow-md rounded px-8 py-6 block hover:shadow-lg transition-shadow duration-300">
-                        <span class="text-blue-500 hover:underline">Start Lesson</span>
-                    </a>
+                        <a href="{{ url_for('lessons.learn_logic', lesson_id=lesson.lesson_id) }}" class="text-blue-500 hover:underline">
+                            Start Lesson
+                        </a>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}

@@ -76,6 +76,21 @@ main.container {
     color: rgb(185, 100, 51);
 }
 
+.custom-progress-bar {
+    background-color: var(--accent-color) !important;
+    border: none;
+}
+
+.button-accent {
+    background-color: var(--accent);
+    color: white;
+}
+
+.button-accent:hover {
+    background-color: var(--background-color);
+    color: white;
+}
+
 .lesson-container {
     width: 100%;
     max-width: 800px;

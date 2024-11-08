@@ -45,10 +45,7 @@ def home():
                 else:
                     lesson['progress_percent'] = 0
 
-            last_lesson = next(
-                (lesson for lesson in lessons if lesson['last_slide_id']), 
-                None
-            )
+            last_lesson = next((lesson for lesson in lessons if lesson['last_slide_id'] and not lesson['is_completed']), None)
 
             return render_template(
                 'home.html', 

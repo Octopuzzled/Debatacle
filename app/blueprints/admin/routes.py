@@ -85,7 +85,7 @@ def add_lesson():
 @is_admin
 def add_slide():
     lesson_id = request.form.get('lesson_id')
-    content = bleach.clean(request.form.get('content'))  # Sanitize HTML
+    content = request.form.get('content')  
     slide_order = request.form.get('slide_order')
 
     # Validate input

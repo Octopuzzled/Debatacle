@@ -35,7 +35,7 @@
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/start">Start here</a>
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('lessons.lessons') }}">Start here</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#">Let's debate</a>
@@ -45,8 +45,8 @@
                       Levels
                     </a>
                     <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="/vocabulary">Level 1: basic vocabulary</a></li>
-                      <li><a class="dropdown-item" href="/logical-structures">Introduction to Logic</a></li>
+                      <li><a class="dropdown-item" href="#">Level 1: basic vocabulary</a></li>
+                      <li><a class="dropdown-item" href="#">Introduction to Logic</a></li>
                       <li><a class="dropdown-item" href="#">Advanced concepts</a></li>
                     </ul>
                   </li>
@@ -58,16 +58,24 @@
                 <ul class="navbar-nav ms-auto">
                   {% if session.get('user_id') %}
                   <li class="nav-item">
-                    <a class="nav-link" href="/logout">Logout</a>
+                      <a class="nav-link" href="{{ url_for('dashboard.home') }}">Home</a>
                   </li>
-                  {% else %}
-                  <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/register">Register</a>
-                  </li>
+                  {% if session.get('is_admin') == 1 %}  <!-- Check if the user is an admin -->
+                      <li class="nav-item">
+                          <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">Admin Panel</a>
+                      </li>
                   {% endif %}
+                  <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                  </li>
+              {% else %}
+                  <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                  </li>
+              {% endif %}
                 </ul>
               </div>
             </div>

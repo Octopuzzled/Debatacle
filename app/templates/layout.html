@@ -35,7 +35,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                   <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                      <a class="nav-link active" aria-current="page" href="{{ url_for('lessons.lessons') }}"">Start here</a>
+                      <a class="nav-link active" aria-current="page" href="{{ url_for('lessons.lessons') }}">Start here</a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="#">Let's debate</a>
@@ -45,16 +45,14 @@
                         Levels
                       </a>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/vocabulary">Level 1: basic vocabulary</a></li>
-                        <li><a class="dropdown-item" href="/logical-structures">Introduction to Logic</a></li>
-                        <li><a class="dropdown-item" href="#">Advanced concepts</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=1) }}">Level 1: Basic vocabulary</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=2) }}">Level 2: Good vs. bad arguments</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=3) }}">Level 3: Logical structures</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=4) }}">Level 4: Common logical fallacies</a></li>
                       </ul>
                     </li>
                   </ul>
-                  <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-info" type="submit">Search</button>
-                  </form>
+          
                   <ul class="navbar-nav ms-auto">
                     {% if session.get('user_id') %}
                         <li class="nav-item">
@@ -101,6 +99,7 @@
           </footer>
           <!-- JQuery -->
           <script src="/static/scripts.js"></script>
+          <script src="/static/search.js"></script>
       </body>
 
 </html>

@@ -1,3 +1,4 @@
+// Code for lesson slides
 document.addEventListener('DOMContentLoaded', () => {
   // Check if lessonData is defined
   if (typeof window.lessonData === 'undefined') {
@@ -74,3 +75,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 });
+
