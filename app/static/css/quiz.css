@@ -1,0 +1,147 @@
+/* quiz.css */
+#quiz-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-question {
+    margin-bottom: 20px;
+}
+
+.question-progress {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.quiz-question h3 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+.choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.choice-btn {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.choice-btn:hover {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.choice-btn.selected {
+    background-color: #e7f5ff;
+    border-color: #339af0;
+    color: #1971c2;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.prev-btn,
+.next-btn,
+.submit-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.prev-btn {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.prev-btn:hover {
+    background-color: #dee2e6;
+}
+
+.next-btn,
+.submit-btn {
+    background-color: #339af0;
+    color: white;
+}
+
+.next-btn:hover,
+.submit-btn:hover {
+    background-color: #1c7ed6;
+}
+
+.next-btn:disabled,
+.submit-btn:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+}
+
+.quiz-results {
+    text-align: center;
+    padding: 30px;
+}
+
+.quiz-results h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.score-details {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.score-details p {
+    margin: 10px 0;
+}
+
+.result-message {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #e7f5ff;
+    color: #1971c2;
+}
+
+.retry-btn {
+    padding: 12px 24px;
+    background-color: #339af0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.retry-btn:hover {
+    background-color: #1c7ed6;
+}
+
+.quiz-error {
+    text-align: center;
+    color: #e03131;
+    padding: 20px;
+}

@@ -14,6 +14,7 @@ from app.blueprints.slides.routes import slides_bp
 from app.blueprints.api.routes import api_bp
 from app.blueprints.auth.routes import auth_bp
 from app.blueprints.dashboard.routes import dashboard_bp
+from app.blueprints.quiz.routes import quiz_bp
 
 def create_app():
     load_dotenv
@@ -42,5 +43,6 @@ def create_app():
     app.register_blueprint(slides_bp, url_prefix='/slides')
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+    app.register_blueprint(quiz_bp, url_prefix='/api/quiz')
 
     return app

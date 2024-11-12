@@ -1,0 +1,3 @@
+2024-11-12 12:00:32,172 - ERROR - An unexpected error occurred: Could not build url for endpoint 'quiz.quiz'. Did you mean 'quiz.get_quiz' instead?
+2024-11-12 12:00:35,544 - ERROR - An unexpected error occurred: Could not build url for endpoint 'quiz.quiz'. Did you mean 'quiz.get_quiz' instead?
+2024-11-12 12:00:40,178 - ERROR - An unexpected error occurred: Could not build url for endpoint 'quiz.quiz'. Did you mean 'quiz.get_quiz' instead?

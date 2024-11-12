@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Homepage
+{% endblock %}
+
+{% block main %}
+    <div class="quiz-container">
+        <h2 id="question"></h2>
+        <ul id="answer-choices">
+            <li>
+                <input type="radio" name="answer" id="choice1">
+                <label for="choice1" id="choice1-text"></label>
+            </li>
+            <li>
+                <input type="radio" name="answer" id="choice2">
+                <label for="choice2" id="choice2-text"></label>
+            </li>
+            <li>
+                <input type="radio" name="answer" id="choice3">
+                <label for="choice3" id="choice3-text"></label>
+            </li>
+            <li>
+                <input type="radio" name="answer" id="choice4">
+                <label for="choice4" id="choice4-text"></label>
+            </li>
+        </ul>
+        <button id="submit">Submit</button>
+        <div id="result"></div>
+    </div>
+{% endblock %}

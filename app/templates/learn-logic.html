@@ -4,17 +4,26 @@
     {{ lesson_name }} {% if slide_order %}- Slide {{ slide_order }}{% endif %}
 {% endblock %}
 
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+{% endblock %}
+
 {% block main %}
     {% if error %}
         <div class="alert alert-danger" role="alert">
             {{ error }}
         </div>
     {% else %}
-        <div class="container">
+        {# Add data attributes for quiz functionality #}
+        <div class="container" data-lesson-id="{{ lesson_id }}" data-total-slides="{{ total_slides }}" data-user-id="{{ session['user_id'] }}">
             <h1 class="text-center mb-4">{{ lesson_name }}</h1>
             
-            <div id="slideContent" class="slide-content mb-4">
-                {{ slide.content|safe }}
+            {# Add slides-container class #}
+            <div class="slides-container">
+                <div id="slideContent" class="slide active" data-slide-order="{{ slide_order }}">
+                    {{ slide.content|safe }}
+                </div>
             </div>
             
             <div class="navigation-controls text-center">
@@ -41,7 +50,8 @@
                     totalSlides: {{ total_slides }}
                 };
             </script>
-            <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
         {% endblock %}
     {% endif %}
 {% endblock %}

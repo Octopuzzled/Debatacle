@@ -39,7 +39,7 @@ a:hover {
 }
 
 .background-container {
-    background-image: url('logic3.png');
+    background-image: url('../logic3.png');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
