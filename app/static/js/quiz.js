@@ -226,22 +226,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    const slideContainer = document.querySelector('.slides-container');
-    if (slideContainer) {
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    checkForQuiz();
-                }
-            });
-        });
-
-        observer.observe(slideContainer, {
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['class']
-        });
-
+    // Listen for slide changes
+    document.addEventListener('slideChanged', (event) => {
+        console.log('Slide changed event received:', event.detail);
         checkForQuiz();
-    }
+    });
+
+    // Initial check
+    checkForQuiz();
 });

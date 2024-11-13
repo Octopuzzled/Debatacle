@@ -12,14 +12,14 @@
         <p>
           Imagine you're having a discussion about something that is important to you. 
           You have an opinion, of course. But the other person has a different one. 
-          What do you do? If you don't tend to scream "I AM RIGHT YOU ***", you instead 
+          What do you do? If you don't tend to just scream at the person, you instead 
           explain why you have this opinion and why you think it's right or at least a good one. 
           Maybe you can convince the other person, maybe they convince you. But how do you 
           make your point as strong as possible instead of rambling?
         </p>
         <p>
           Or imagine you've just heard politicians tell the public why they're awesome and 
-          their plans are good. How do you know if you agree or not? You could just belief 
+          their plans are good. How do you know if you agree or not? You could just believe 
           the person who looks better or uses shorter sentences because that's easy to understand. 
           Or you could figure out whether what they're saying makes sense in the first place. 
           But how do you go about that?
@@ -42,12 +42,10 @@
       </div>
       <div class="col-12 col-md-6 order-1 order-md-2 quick-start text-center">
         <h3>Quick start guide</h3>
-        <p><a href="/vocabulary">Lvl 1:</a> Basic vocabulary</p>
-        <p>What makes good arguments</p>
-        <p><a href="/logical-structures">Lvl 3: Common logic structures</a></p>
-        <p>Common tricks to fool you aka logical fallacies</p>
-        <p>Example arguments (interactive)</p>
-        <p>Argument builder (interactive)</p>
+        <p><a href="{{ url_for('lessons.learn_logic', lesson_id=1) }}">Lvl 1: Basic vocabulary</a></p>
+        <p><a href="{{ url_for('lessons.learn_logic', lesson_id=2) }}">Lvl 2: What makes good arguments</a></p>
+        <p><a href="{{ url_for('lessons.learn_logic', lesson_id=3) }}">Lvl 3: Common logical structures</a></p>
+        <p><a href="{{ url_for('lessons.learn_logic', lesson_id=4) }}">Lvl 4: Common tricks to fool you aka logical fallacies</a></p>
       </div>
     </div>
   </div>

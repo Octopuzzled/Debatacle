@@ -1,7 +1,7 @@
 from app.db_connection import get_connection, close_connection
 
 def add_quiz(lesson_id: int, title: str, questions: list) -> bool:
-    """Add a quiz to a specific lesson"""
+    """Add or update a quiz for a specific lesson"""
     connection = get_connection()
     if not connection:
         return False
@@ -9,7 +9,20 @@ def add_quiz(lesson_id: int, title: str, questions: list) -> bool:
     cursor = connection.cursor()
     
     try:
-        # Insert quiz
+        # Check if quiz exists
+        cursor.execute("""
+            SELECT quiz_id FROM quizzes 
+            WHERE lesson_id = %s
+        """, (lesson_id,))
+        
+        existing_quiz = cursor.fetchone()
+        
+        if existing_quiz:
+            print(f"Quiz already exists for lesson {lesson_id}. Deleting old quiz...")
+            # Delete old quiz (this will cascade to questions and choices)
+            cursor.execute("DELETE FROM quizzes WHERE lesson_id = %s", (lesson_id,))
+        
+        # Insert new quiz
         cursor.execute("""
             INSERT INTO quizzes (lesson_id, title)
             VALUES (%s, %s)
@@ -35,11 +48,11 @@ def add_quiz(lesson_id: int, title: str, questions: list) -> bool:
                 """, (question_id, choice['text'], choice['is_correct']))
         
         connection.commit()
-        print("Quiz added successfully!")
+        print("Quiz added/updated successfully!")
         return True
         
     except Exception as e:
-        print(f"Error adding quiz: {e}")
+        print(f"Error adding/updating quiz: {e}")
         connection.rollback()
         return False
         
@@ -66,7 +79,7 @@ if __name__ == "__main__":
             'text': 'What is the difference between a valid and a sound argument?',
             'choices': [
                 {'text': 'A valid argument has true premises, while a sound argument has a true conclusion.', 'is_correct': False},
-                {'text': 'A valid argument has a conclusion that logically follows from its premises, while a sound ', 'is_correct': True},
+                {'text': 'A valid argument has a conclusion that logically follows from its premises, while a sound argument has both a valid form and true premises.', 'is_correct': True},
                 {'text': 'A valid argument is based on evidence, while a sound argument is based on logic.', 'is_correct': False},
                 {'text': 'A valid argument is persuasive, while a sound argument is factual.', 'is_correct': False}
             ]
