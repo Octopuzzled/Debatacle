@@ -1,4 +1,3 @@
-// Code for lesson slides
 document.addEventListener('DOMContentLoaded', () => {
     // Check if lessonData is defined
     if (typeof window.lessonData === 'undefined') {
@@ -11,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextButton = document.getElementById('nextSlide');
     const slideNumberSpan = document.getElementById('slideNumber');
 
-    // Destructure lessonData safely
-    const { lessonId, currentSlide, totalSlides } = window.lessonData;
+    // Destructure lessonData safely with the new structure
+    const { lessonId, currentSlide, totalSlides, baseUrl, updateProgressUrl } = window.lessonData;
     let currentSlideOrder = currentSlide;
 
     function updateSlide(newSlideOrder) {
@@ -43,11 +42,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Update navigation elements
                 slideNumberSpan.textContent = `Slide ${newSlideOrder} of ${totalSlides}`;
+                
+                // Update button states
                 prevButton.disabled = newSlideOrder <= 1;
+                prevButton.classList.toggle('disabled', newSlideOrder <= 1);
+                prevButton.setAttribute('aria-disabled', newSlideOrder <= 1);
+                
                 nextButton.disabled = newSlideOrder >= totalSlides;
+                nextButton.classList.toggle('disabled', newSlideOrder >= totalSlides);
+                nextButton.setAttribute('aria-disabled', newSlideOrder >= totalSlides);
 
-                // Update URL without reloading
-                history.pushState(null, '', `/lessons/learn-logic/${lessonId}/${newSlideOrder}`);
+                // Update URL without reloading - using the new baseUrl
+                history.pushState(null, '', `${baseUrl}${newSlideOrder}`);
 
                 // Update current slide order
                 currentSlideOrder = newSlideOrder;
@@ -58,6 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Important: Add active class after a brief delay
                 setTimeout(() => {
                     slideDiv.classList.add('active');
+                    // Add rounded class for styling
+                    slideDiv.classList.add('p-4', 'rounded');
+                    
                     // Manually trigger quiz check on last slide
                     if (newSlideOrder === totalSlides) {
                         const event = new CustomEvent('slideChanged', {
@@ -66,17 +75,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.dispatchEvent(event);
                     }
                 }, 0);
+
+                // Update progress bar
+                const progressBar = document.querySelector('.progress-bar');
+                if (progressBar) {
+                    const progressPercent = (newSlideOrder / totalSlides * 100).toFixed(0);
+                    progressBar.style.width = `${progressPercent}%`;
+                    progressBar.setAttribute('aria-valuenow', newSlideOrder);
+                }
             })
             .catch(error => console.error('Error updating slide:', error));
     }
 
     // Attach click handlers using event delegation
     document.addEventListener('click', (event) => {
-        if (event.target.id === 'prevSlide' && !event.target.disabled) {
+        if (event.target.closest('#prevSlide:not(.disabled)')) {
             if (currentSlideOrder > 1) {
                 updateSlide(currentSlideOrder - 1);
             }
-        } else if (event.target.id === 'nextSlide' && !event.target.disabled) {
+        } else if (event.target.closest('#nextSlide:not(.disabled)')) {
             if (currentSlideOrder < totalSlides) {
                 updateSlide(currentSlideOrder + 1);
             }
@@ -84,7 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateProgress(slideOrder) {
-        fetch(`/slides/api/update-progress/${lessonId}/${slideOrder}`, { method: 'POST' })
+        // Construct the URL in JavaScript instead of relying on Flask's url_for
+        fetch(`/slides/api/update-progress/${lessonId}/${slideOrder}`, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -94,6 +117,19 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => console.log('Progress updated:', data))
             .catch(error => console.error('Error updating progress:', error));
     }
+
+    // Add keyboard navigation
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft' && !prevButton.disabled) {
+            if (currentSlideOrder > 1) {
+                updateSlide(currentSlideOrder - 1);
+            }
+        } else if (event.key === 'ArrowRight' && !nextButton.disabled) {
+            if (currentSlideOrder < totalSlides) {
+                updateSlide(currentSlideOrder + 1);
+            }
+        }
+    });
 
     // Add popstate listener
     window.addEventListener('popstate', (event) => {
@@ -108,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the first slide's state
     const initialSlide = document.getElementById('slideContent');
     if (initialSlide) {
-        initialSlide.className = 'slide active';
+        initialSlide.classList.add('slide', 'active', 'p-4', 'rounded');
         initialSlide.setAttribute('data-slide-order', currentSlide);
     }
 });

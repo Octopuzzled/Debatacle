@@ -1,29 +1,273 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Edit Slide
+    Edit Slide {{ slide['slide_order'] }}
 {% endblock %}
 
 {% block main %}
-<div class="container">
-    <h1>Edit Slide</h1>
+<div class="container py-4 px-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card">
+                <!-- Header section remains the same -->
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">Edit Slide {{ slide['slide_order'] }}</h1>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('admin.admin_panel') }}" class="btn btn-outline-secondary btn-sm">
+                            Back to Admin Panel
+                        </a>
+                    </div>
+                </div>
 
-    <form action="{{ url_for('admin.edit_slide', slide_id=slide['slide_id']) }}" method="POST">
-        <input type="hidden" name="lesson_id" value="{{ slide['lesson_id'] }}">
-        <div class="form-group">
-            <label for="content">Slide Content</label>
-            <textarea class="form-control" id="content" name="content" rows="3" required>{{ slide['content'] }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="slide_order">Slide Order</label>
-            <input type="number" class="form-control" id="slide_order" name="slide_order" value="{{ slide['slide_order'] }}" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-    </form>
+                <div class="card-body">
+                    <form action="{{ url_for('admin.edit_slide', slide_id=slide['slide_id']) }}" 
+                          method="POST"
+                          class="needs-validation"
+                          novalidate>
+                        <input type="hidden" name="lesson_id" value="{{ slide['lesson_id'] }}">
+                        
+                        <!-- Slide Content section -->
+                        <div class="mb-3">
+                            <label for="content" class="form-label d-flex justify-content-between">
+                                <span>
+                                    Slide Content 
+                                    <small class="text-muted">(HTML supported)</small>
+                                </span>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="insertHtml('<h1>', '</h1>')">H1</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="insertHtml('<h2>', '</h2>')">H2</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="insertHtml('<p>', '</p>')">P</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="insertHtml('<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n</ul>')">List</button>
+                                </div>
+                            </label>
+                            <textarea class="form-control font-monospace" 
+                                    id="content" 
+                                    name="content" 
+                                    rows="10" 
+                                    required
+                                    minlength="1"
+                                    maxlength="5000"
+                                    onInput="updatePreview()">{{ slide['content'] }}</textarea>
+                            <div class="invalid-feedback">
+                                Please provide slide content (1-5000 characters).
+                            </div>
+                            <div class="form-text">
+                                Use HTML tags for formatting. Common tags: &lt;h1&gt;, &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;
+                            </div>
+                        </div>
 
-    <h2>Preview:</h2>
-    <div id="slideContent" class="slide-content mb-4">
-        {{ slide.content | safe }}
+                        <!-- Slide Order section -->
+                        <div class="mb-4">
+                            <label for="slide_order" class="form-label">Slide Order</label>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeOrder(-1)">-</button>
+                                <input type="number" 
+                                       class="form-control text-center" 
+                                       id="slide_order" 
+                                       name="slide_order" 
+                                       value="{{ slide['slide_order'] }}"
+                                       required
+                                       min="1"
+                                       max="{{ total_slides }}">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeOrder(1)">+</button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a number between 1 and {{ total_slides }}.
+                            </div>
+                            <div class="form-text">
+                                Current position: {{ slide['slide_order'] }} of {{ total_slides }}
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="reset" class="btn btn-outline-secondary" onclick="handleReset()">Reset Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">Live Preview</h2>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary" onclick="switchPreview('formatted')" id="btnFormatted">
+                            Formatted
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="switchPreview('raw')" id="btnRaw">
+                            Raw HTML
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="switchPreview('mobile')" id="btnMobile">
+                            Mobile View
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="previewFormatted" class="slide-content">
+                        {{ slide.content | safe }}
+                    </div>
+                    <pre id="previewRaw" class="d-none mb-0">
+                        <code class="html">{{ slide.content }}</code>
+                    </pre>
+                    <div id="previewMobile" class="d-none">
+                        <div class="mobile-frame mx-auto">
+                            <div class="mobile-content">
+                                {{ slide.content | safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+.mobile-frame {
+    width: 375px;
+    height: 667px;
+    border: 16px solid #333;
+    border-radius: 36px;
+    overflow: hidden;
+    position: relative;
+}
+
+.mobile-content {
+    height: 100%;
+    padding: 20px;
+    overflow-y: auto;
+    background: white;
+}
+
+.slide-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+.btn-group .btn.active {
+    background-color: #0d6efd;
+    color: white;
+}
+</style>
+
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
+    
+    // Initialize form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Set initial preview state
+    document.getElementById('btnFormatted').classList.add('active');
+    updatePreview();
+});
+
+// Preview switching functionality
+function switchPreview(type) {
+    // Get all preview elements
+    const formatted = document.getElementById('previewFormatted');
+    const raw = document.getElementById('previewRaw');
+    const mobile = document.getElementById('previewMobile');
+    
+    // Get all buttons
+    const btnFormatted = document.getElementById('btnFormatted');
+    const btnRaw = document.getElementById('btnRaw');
+    const btnMobile = document.getElementById('btnMobile');
+    
+    // Hide all previews and remove active class from buttons
+    [formatted, raw, mobile].forEach(el => el.classList.add('d-none'));
+    [btnFormatted, btnRaw, btnMobile].forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected preview and activate corresponding button
+    switch(type) {
+        case 'formatted':
+            formatted.classList.remove('d-none');
+            btnFormatted.classList.add('active');
+            break;
+        case 'raw':
+            raw.classList.remove('d-none');
+            btnRaw.classList.add('active');
+            break;
+        case 'mobile':
+            mobile.classList.remove('d-none');
+            btnMobile.classList.add('active');
+            break;
+    }
+}
+
+// Update all previews when content changes
+function updatePreview() {
+    const content = document.getElementById('content').value;
+    const sanitizedContent = DOMPurify.sanitize(content);
+    
+    // Update formatted view
+    document.getElementById('previewFormatted').innerHTML = sanitizedContent;
+    
+    // Update raw view
+    document.getElementById('previewRaw').querySelector('code').textContent = content;
+    
+    // Update mobile view
+    document.getElementById('previewMobile').querySelector('.mobile-content').innerHTML = sanitizedContent;
+}
+
+// Handle slide order changes
+function changeOrder(delta) {
+    const input = document.getElementById('slide_order');
+    const currentValue = parseInt(input.value) || 0;
+    const maxValue = parseInt(input.max) || 100;
+    const newValue = Math.min(Math.max(1, currentValue + delta), maxValue);
+    input.value = newValue;
+}
+
+// Handle HTML tag insertion
+function insertHtml(startTag, endTag = '') {
+    const textarea = document.getElementById('content');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    const newText = startTag + selectedText + endTag;
+    
+    textarea.value = 
+        textarea.value.substring(0, start) + 
+        newText + 
+        textarea.value.substring(end);
+    
+    updatePreview();
+    
+    // Set cursor position after insertion
+    textarea.focus();
+    const newCursorPos = start + startTag.length + selectedText.length + endTag.length;
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+}
+
+// Handle form reset
+function handleReset() {
+    // Wait for the next tick to ensure the form reset has completed
+    setTimeout(() => {
+        updatePreview();
+    }, 0);
+}
+
+// Add reset event listener to the form
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    form.addEventListener('reset', handleReset);
+});
+
+</script>
+
+<!-- DOMPurify for sanitizing HTML -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 {% endblock %}

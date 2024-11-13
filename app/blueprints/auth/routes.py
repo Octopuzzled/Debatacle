@@ -46,28 +46,39 @@ def logout():
 def register():
     """Register user"""
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
+        # Get form data with stripped whitespace
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
 
+        # Validate required fields
         if not username:
             return error_handling("Invalid username", 400)
+
         if not password or not confirmation:
             return error_handling("Please enter a password and confirm it", 400)
-        if not password == confirmation:
+
+        if password != confirmation:
             return error_handling("Passwords don't match", 400)
+
         if len(password) < 8:
             return error_handling("Password must be at least 8 characters long.", 400)
+
         if not valid_email(email):
             return error_handling("Please enter a valid email address", 400)
 
-        hashed_password, salt = create_password_hash(password)
-        result = register_user(username, email, salt, hashed_password)
-        
-        if result:
-            return result
-        else:
+        # Create password hash and register user
+        try:
+            hashed_password, salt = create_password_hash(password)
+            result = register_user(username, email, salt, hashed_password)
+            
+            if result:
+                return result
             return error_handling("Registration failed", 400)
-    else:
-        return render_template("register.html")
+            
+        except Exception as e:
+            return error_handling("Registration failed", 400)
+
+    # GET request
+    return render_template("register.html")

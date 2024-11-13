@@ -1,103 +1,99 @@
 <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
 
-  <html lang="en">
+        <!-- http://getbootstrap.com/docs/5.3/ -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
 
-      <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="initial-scale=1, width=device-width">
+        <!-- Font for headings: Space Grotesk-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
 
-          <!-- http://getbootstrap.com/docs/5.3/ -->
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-          
-          <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-          <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+        <!-- Font for normal text: Open Sans-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
 
-          <!-- Font for headings: Space Grotesk-->
-          <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+        <title>{% block title %}Debatacle{% endblock %}</title>
+    </head>
 
-          <!-- Font for normal text: Open Sans-->
-          <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
-  
-          <title>Debatacle</title>
-      </head>
-
-      <body class="backgroud-container">
-          <nav class="navbar navbar-dark navbar-expand-lg">
-              <div class="container-fluid">
+    <body class="backgroud-container">
+        <nav class="navbar navbar-dark navbar-expand-lg">
+            <div class="container-fluid">
                 <a class="navbar-brand" href="/">Debatacle</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                      <a class="nav-link active" aria-current="page" href="{{ url_for('lessons.lessons') }}">Start here</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Levels
-                      </a>
-                      <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=1) }}">Level 1: Basic vocabulary</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=2) }}">Level 2: Good vs. bad arguments</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=3) }}">Level 3: Logical structures</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=4) }}">Level 4: Common logical fallacies</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-          
-                  <ul class="navbar-nav ms-auto">
-                    {% if session.get('user_id') %}
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('dashboard.home') }}">Home</a>
+                            <a class="nav-link active" aria-current="page" href="{{ url_for('lessons.lessons') }}">Start here</a>
                         </li>
-                        {% if session.get('is_admin') == 1 %}  <!-- Check if the user is an admin -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Levels
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=1) }}">Level 1: Basic vocabulary</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=2) }}">Level 2: Good vs. bad arguments</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=3) }}">Level 3: Logical structures</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('lessons.learn_logic', lesson_id=4) }}">Level 4: Common logical fallacies</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+            
+                    <ul class="navbar-nav ms-auto">
+                        {% if session.get('user_id') %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">Admin Panel</a>
+                                <a class="nav-link" href="{{ url_for('dashboard.home') }}">Home</a>
+                            </li>
+                            {% if session.get('is_admin') == 1 %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">Admin Panel</a>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
                             </li>
                         {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-                        </li>
-                    {% endif %}
-                </ul>
-                
+                    </ul>
                 </div>
-              </div>
-            </nav>
+            </div>
+        </nav>
 
-            <section class="background-container">
-              <div class="fs-1 text-center">
+        <section class="background-container">
+            <div class="fs-1 text-center">
                 <p>Everyone has something to say</p>
                 <p>- let's navigate the chaos with logic</p>
-              </div>
-            </section>
-              
+            </div>
+        </section>
 
-          <main class="container py-5">
-              {% block main %}{% endblock %}
-          </main>
+        <main class="container py-5">
+            {% block main %}{% endblock %}
+        </main>
 
-          <footer>
-              <p class="mb-3 small text-center text-muted">
-                  Copyright 2024 Octopuzzled
-              </p>
-          </footer>
-          <!-- JQuery -->
-          <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-          <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
-      </body>
+        <footer>
+            <p class="mb-3 small text-center text-muted">
+                Copyright © {{ now.year if now else '2024' }} Octopuzzled
+            </p>
+        </footer>
 
+        <!-- JQuery -->
+        <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+    </body>
 </html>

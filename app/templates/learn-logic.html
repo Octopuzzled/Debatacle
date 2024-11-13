@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    {{ lesson_name }} {% if slide_order %}- Slide {{ slide_order }}{% endif %}
+    {{ lesson_name }}{% if slide_order %} - Slide {{ slide_order }}{% endif %}
 {% endblock %}
 
 {% block head %}
@@ -10,48 +10,79 @@
 {% endblock %}
 
 {% block main %}
-    {% if error %}
-        <div class="alert alert-danger" role="alert">
-            {{ error }}
-        </div>
-    {% else %}
-        {# Add data attributes for quiz functionality #}
-        <div class="container" data-lesson-id="{{ lesson_id }}" data-total-slides="{{ total_slides }}" data-user-id="{{ session['user_id'] }}">
-            <h1 class="text-center mb-4">{{ lesson_name }}</h1>
-            
-            {# Add slides-container class #}
-            <div class="slides-container">
-                <div id="slideContent" class="slide active" data-slide-order="{{ slide_order }}">
-                    {{ slide.content|safe }}
+    <div class="container py-3">
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% else %}
+            {# Lesson Container with Data Attributes #}
+            <div class="lesson-container" 
+                 data-lesson-id="{{ lesson_id }}" 
+                 data-total-slides="{{ total_slides }}" 
+                 data-user-id="{{ session['user_id'] }}">
+                
+                {# Lesson Header #}
+                <header class="mb-4">
+                    <h1 class="text-center">{{ lesson_name }}</h1>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar bg-primary" 
+                             role="progressbar"
+                             style="width: {{ (slide_order / total_slides * 100)|round }}%"
+                             aria-valuenow="{{ slide_order }}"
+                             aria-valuemin="1"
+                             aria-valuemax="{{ total_slides }}">
+                        </div>
+                    </div>
+                </header>
+
+                {# Slide Content #}
+                <div class="slides-container mb-4">
+                    <div id="slideContent" 
+                         class="slide active p-4 rounded" 
+                         data-slide-order="{{ slide_order }}">
+                        {{ slide.content|safe }}
+                    </div>
+                </div>
+
+                {# Navigation Controls #}
+                <div class="navigation-controls d-flex justify-content-between align-items-center">
+                    <button id="prevSlide" 
+                            class="btn btn-primary{% if slide_order <= 1 %} disabled{% endif %}"
+                            {% if slide_order <= 1 %}disabled aria-disabled="true"{% endif %}>
+                        <span class="d-none d-sm-inline">Previous</span>
+                        <span class="d-sm-none">←</span>
+                    </button>
+
+                    <div class="slide-indicator">
+                        <span id="slideNumber" class="badge bg-secondary px-3 py-2">
+                            Slide {{ slide_order }} of {{ total_slides }}
+                        </span>
+                    </div>
+
+                    <button id="nextSlide" 
+                            class="btn btn-primary{% if slide_order >= total_slides %} disabled{% endif %}"
+                            {% if slide_order >= total_slides %}disabled aria-disabled="true"{% endif %}>
+                        <span class="d-none d-sm-inline">Next</span>
+                        <span class="d-sm-none">→</span>
+                    </button>
                 </div>
             </div>
-            
-            <div class="navigation-controls text-center">
-                <button id="prevSlide" class="btn btn-primary" {% if slide_order <= 1 %}disabled{% endif %}>
-                    Previous
-                </button>
-                
-                <span id="slideNumber" class="mx-3">
-                    Slide {{ slide_order }} of {{ total_slides }}
-                </span>
-                
-                <button id="nextSlide" class="btn btn-primary" {% if slide_order >= total_slides %}disabled{% endif %}>
-                    Next
-                </button>
-            </div>
-        </div>
 
-        {% block scripts %}
+            {# Script Initialization #}
+            {# Script Initialization - remove the updateProgress URL construction #}
+            {% block scripts %}
             <script>
-                // Pass data from Flask to JavaScript
+                // Initialize lesson data
                 window.lessonData = {
                     lessonId: {{ lesson_id }},
                     currentSlide: {{ slide_order }},
                     totalSlides: {{ total_slides }}
                 };
             </script>
-            <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-            <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
-        {% endblock %}
-    {% endif %}
+            <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+            <script src="{{ url_for('static', filename='js/quiz.js') }}" defer></script>
+            {% endblock %}
+        {% endif %}
+    </div>
 {% endblock %}

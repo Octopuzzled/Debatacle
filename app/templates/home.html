@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}
-    Homepage
-{% endblock %}
+{% block title %}Homepage{% endblock %}
 
 {% block main %}    
     <div class="container px-3 py-4">
@@ -13,7 +11,7 @@
                 {{ error }}
             </div>
         {% else %}
-            <!-- Continue Section -->
+            {# Continue Learning Section #}
             {% if last_lesson %}
                 <div class="card mb-4">
                     <div class="card-body">
@@ -46,56 +44,59 @@
                 </div>
             {% endif %}
             
-            <!-- All Lessons -->
+            {# All Lessons Section #}
             {% if all_lessons %}
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="h4 mb-0">Course Lessons</h2>
-                </div>
-                <div class="list-group list-group-flush">
-                    {% for lesson in all_lessons %}
-                    <div class="list-group-item p-3">
-                        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3">
-                            <span class="badge {% if lesson.is_completed %}bg-success{% else %}bg-warning{% endif %} align-self-start">
-                                {{ loop.index }}
-                            </span>
-                            <div class="flex-grow-1 min-width-0">
-                                <h3 class="h6 mb-2 text-break">{{ lesson.lesson_name }}</h3>
-                                <div class="progress mb-2" style="height: 8px;">
-                                    <div class="progress-bar {% if lesson.is_completed %}bg-success{% else %}bg-warning{% endif %}" 
-                                         role="progressbar" 
-                                         style="width: {{ lesson.progress_percent }}%"
-                                         aria-valuenow="{{ lesson.progress_percent }}" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="100">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="h4 mb-0">Course Lessons</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for lesson in all_lessons %}
+                            <div class="list-group-item p-3">
+                                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3">
+                                    <span class="badge {% if lesson.is_completed %}bg-success{% else %}bg-warning{% endif %} align-self-start">
+                                        {{ loop.index }}
+                                    </span>
+                                    
+                                    <div class="flex-grow-1 min-width-0">
+                                        <h3 class="h6 mb-2 text-break">{{ lesson.lesson_name }}</h3>
+                                        <div class="progress mb-2" style="height: 8px;">
+                                            <div class="progress-bar {% if lesson.is_completed %}bg-success{% else %}bg-warning{% endif %}" 
+                                                role="progressbar" 
+                                                style="width: {{ lesson.progress_percent }}%"
+                                                aria-valuenow="{{ lesson.progress_percent }}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <div class="small text-muted">
+                                            Progress: {{ lesson.progress_percent }}%
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+                                        {% if lesson.is_completed %}
+                                            <span class="badge bg-success d-flex align-items-center gap-1">
+                                                <i class="bi bi-check-circle"></i> Completed
+                                            </span>
+                                        {% endif %}
+                                        
+                                        <a href="{{ url_for('lessons.learn_logic', lesson_id=lesson.lesson_id, slide_order=lesson.current_progress or 1) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            {% if lesson.is_completed %}
+                                                Review Lesson
+                                            {% elif lesson.current_progress %}
+                                                Continue
+                                            {% else %}
+                                                Start Lesson
+                                            {% endif %}
+                                        </a>
                                     </div>
                                 </div>
-                                <div class="small text-muted">
-                                    Progress: {{ lesson.progress_percent }}%
-                                </div>
                             </div>
-                            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
-                                {% if lesson.is_completed %}
-                                    <span class="badge bg-success d-flex align-items-center gap-1">
-                                        <i class="bi bi-check-circle"></i> Completed
-                                    </span>
-                                {% endif %}
-                                <a href="{{ url_for('lessons.learn_logic', lesson_id=lesson.lesson_id, slide_order=lesson.current_progress or 1) }}" 
-                                   class="btn btn-outline-primary btn-sm">
-                                    {% if lesson.is_completed %}
-                                        Review Lesson
-                                    {% elif lesson.current_progress %}
-                                        Continue
-                                    {% else %}
-                                        Start Lesson
-                                    {% endif %}
-                                </a>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
             {% endif %}
         {% endif %}
     </div>

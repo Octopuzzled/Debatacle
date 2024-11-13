@@ -1,27 +1,198 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Edit Lesson
+    Edit Lesson - {{ lesson['lesson_name'] }}
 {% endblock %}
 
 {% block main %}
-<div class="container">
-    <h1>Edit Lesson</h1>
-
-    <form action="{{ url_for('admin.edit_lesson', lesson_id=lesson['lesson_id']) }}" method="POST">
-        <div class="form-group">
-            <label for="lesson_name">Lesson Name</label>
-            <input type="text" class="form-control" id="lesson_name" name="lesson_name" value="{{ lesson['lesson_name'] }}" required>
+<div class="container py-4 px-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">Edit Lesson</h1>
+                    <a href="{{ url_for('admin.admin_panel') }}" class="btn btn-outline-secondary btn-sm">
+                        Back to Admin Panel
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    <form action="{{ url_for('admin.edit_lesson', lesson_id=lesson['lesson_id']) }}" 
+                          method="POST"
+                          class="needs-validation"
+                          novalidate>
+                        
+                        <!-- Lesson Name -->
+                        <div class="mb-3">
+                            <label for="lesson_name" class="form-label">Lesson Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="lesson_name" 
+                                   name="lesson_name" 
+                                   value="{{ lesson['lesson_name'] }}"
+                                   required
+                                   minlength="3"
+                                   maxlength="100">
+                            <div class="invalid-feedback">
+                                Please provide a lesson name (3-100 characters).
+                            </div>
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                Description
+                                <small class="text-muted">(HTML supported)</small>
+                            </label>
+                            <textarea class="form-control font-monospace" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="5"
+                                      required
+                                      minlength="10"
+                                      maxlength="2000">{{ lesson['description'] }}</textarea>
+                            <div class="invalid-feedback">
+                                Please provide a description (10-2000 characters).
+                            </div>
+                            <div class="form-text">
+                                You can use HTML tags for formatting. Example: &lt;strong&gt;bold&lt;/strong&gt;, &lt;em&gt;italic&lt;/em&gt;
+                            </div>
+                        </div>
+                        
+                        <!-- Total Slides -->
+                        <div class="mb-4">
+                            <label for="total_slides" class="form-label">Total Slides</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="total_slides" 
+                                   name="total_slides" 
+                                   value="{{ lesson['total_slides'] }}"
+                                   required
+                                   min="1"
+                                   max="100">
+                            <div class="invalid-feedback">
+                                Please enter a number between 1 and 100.
+                            </div>
+                            <div class="form-text">
+                                Current number of slides: {{ lesson['total_slides'] }}
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Save Changes
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                Reset Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Preview Section -->
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h6 mb-0">Live Preview</h2>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary active" id="previewFormatted">
+                                Formatted
+                            </button>
+                            <button class="btn btn-outline-secondary" id="previewRaw">
+                                Raw HTML
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="h5 mb-2 preview-title">{{ lesson['lesson_name'] }}</h3>
+                            <!-- Formatted Preview -->
+                            <div id="formattedPreview" class="preview-description mb-2">
+                                {{ lesson['description'] | safe }}
+                            </div>
+                            <!-- Raw HTML Preview -->
+                            <pre id="rawPreview" class="preview-description mb-2 d-none">
+                                <code class="html">{{ lesson['description'] }}</code>
+                            </pre>
+                            <div class="small text-muted">
+                                Total Slides: <span class="preview-slides">{{ lesson['total_slides'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3" required>{{ lesson['description'] }}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="total_slides">Total Slides</label>
-            <input type="number" class="form-control" id="total_slides" name="total_slides" value="{{ lesson['total_slides'] }}" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-    </form>
+    </div>
 </div>
+
+<!-- Form Validation and Preview Script -->
+<script>
+    (function () {
+        'use strict'
+        
+        // Form validation
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+        
+        // Preview elements
+        const titleInput = document.getElementById('lesson_name')
+        const descInput = document.getElementById('description')
+        const slidesInput = document.getElementById('total_slides')
+        const previewTitle = document.querySelector('.preview-title')
+        const formattedPreview = document.getElementById('formattedPreview')
+        const rawPreview = document.getElementById('rawPreview')
+        const previewSlides = document.querySelector('.preview-slides')
+        
+        // Preview toggle buttons
+        const btnFormatted = document.getElementById('previewFormatted')
+        const btnRaw = document.getElementById('previewRaw')
+        
+        // Update previews
+        function updatePreviews() {
+            const htmlContent = descInput.value || 'Lesson description'
+            formattedPreview.innerHTML = DOMPurify.sanitize(htmlContent)
+            rawPreview.querySelector('code').textContent = htmlContent
+        }
+        
+        // Live updates
+        titleInput.addEventListener('input', e => {
+            previewTitle.textContent = e.target.value || 'Lesson Title'
+        })
+        
+        descInput.addEventListener('input', updatePreviews)
+        
+        slidesInput.addEventListener('input', e => {
+            previewSlides.textContent = e.target.value || '0'
+        })
+        
+        // Preview toggle
+        btnFormatted.addEventListener('click', () => {
+            formattedPreview.classList.remove('d-none')
+            rawPreview.classList.add('d-none')
+            btnFormatted.classList.add('active')
+            btnRaw.classList.remove('active')
+        })
+        
+        btnRaw.addEventListener('click', () => {
+            formattedPreview.classList.add('d-none')
+            rawPreview.classList.remove('d-none')
+            btnFormatted.classList.remove('active')
+            btnRaw.classList.add('active')
+        })
+        
+        // Initial preview update
+        updatePreviews()
+    })()
+</script>
+
+<!-- DOMPurify for sanitizing HTML -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 {% endblock %}
