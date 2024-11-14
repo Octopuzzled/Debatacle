@@ -10,9 +10,9 @@
                 <div class="card-header bg-transparent">
                     <h1 class="h4 text-center mb-0">Login to your account</h1>
                 </div>
-                
+                 <!-- This part looked lame so I asked Claude for how to get this classic login look. I oriented myself on that template. -->
                 <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}  <!-- This jinja part was idea of Claude -->
                         {% if messages %}
                             {% for category, message in messages %}
                                 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
@@ -90,6 +90,8 @@
         </div>
     </div>
 </div>
+
+ <!-- Bootsrap icons where suggested by Claude. They and ChatGPT helped me with the JS, too.-->
 
 <!-- Add Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">

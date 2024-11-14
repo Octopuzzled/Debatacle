@@ -1,3 +1,5 @@
+// I' bad with JS whenever it doesn't look like Python or C or Java. So AI had to help me a lot with the entire JS code.
+
 // Define the Quiz class
 class Quiz {
     constructor(lessonId) {

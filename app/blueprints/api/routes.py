@@ -4,6 +4,7 @@ from app.db_connection import get_connection, close_connection
 
 api_bp = Blueprint('api', __name__)
 
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right. 
 @api_bp.route('/api/lessons')
 def get_lessons():
     connection = get_connection()
@@ -43,6 +44,7 @@ def get_user_progress():
             """, (user_id,))
             progress = cursor.fetchall()
             
+            # ChatGPT helped with this dictonary part specifically
             progress_dict = {
                 p['lesson_id']: {
                     'last_slide_id': p['last_slide_id'],

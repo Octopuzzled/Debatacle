@@ -4,9 +4,10 @@ from app.blueprints.auth.utils import is_admin
 from app.db_connection import get_connection, close_connection
 from app.utils.error_handling import error_handling
 import logging
-import bleach
 
 admin_bp = Blueprint('admin', __name__)
+
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right. Hours of bugfixing with AI.
 
 @admin_bp.route('/admin', methods=['GET'])
 @is_admin

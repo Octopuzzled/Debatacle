@@ -6,7 +6,7 @@ from app.blueprints.auth.utils import  create_password_hash, login_user, registe
 
 auth_bp = Blueprint('auth', __name__)
 
-
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right.
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -68,17 +68,14 @@ def register():
         if not valid_email(email):
             return error_handling("Please enter a valid email address", 400)
 
-        # Create password hash and register user
+        # Register user
         try:
-            hashed_password, salt = create_password_hash(password)
-            result = register_user(username, email, salt, hashed_password)
-            
-            if result:
-                return result
-            return error_handling("Registration failed", 400)
-            
+            result = register_user(username, email, password)
+            if isinstance(result, str):  # If it's an error message
+                return error_handling(result, 400)
+            return result  # Should be the redirect
         except Exception as e:
             return error_handling("Registration failed", 400)
 
     # GET request
-    return render_template("register.html")
+    return render_template("register.html")  # Update template path if needed

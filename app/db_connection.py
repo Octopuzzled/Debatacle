@@ -11,7 +11,7 @@ password = os.getenv("MYSQL_PASSWORD")
 host = os.getenv("MYSQL_HOST", "localhost")  # Default to localhost if not set
 database = os.getenv("MYSQL_DATABASE", "debatacle")  # Default database
 
-# Create a connection pool
+# Create a connection pool - this was idea auf ChatGPT, didn't have a pool before
 connection_pool = pooling.MySQLConnectionPool(
     pool_name="mypool",
     pool_size=5,  # Set the number of connections in the pool

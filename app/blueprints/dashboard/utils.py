@@ -5,7 +5,7 @@ def get_user_progress(user_id):
     if connection is None:
         return None
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(dictionary=True) # dictionary idea from AI
         cursor.execute("""
             SELECT lesson_id, slide_order 
             FROM user_progress 

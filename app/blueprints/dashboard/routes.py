@@ -6,6 +6,8 @@ from app.blueprints.auth.utils import login_required
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right.
+
 @dashboard_bp.route("/home", methods=["GET"])
 @login_required
 def home():
@@ -13,7 +15,7 @@ def home():
     connection = get_connection()
     
     try:
-        with connection.cursor(dictionary=True) as cursor:
+        with connection.cursor(dictionary=True) as cursor: # lots of help by Claude here, because I constantly got it wrong
             cursor.execute("""
                 SELECT 
                     l.lesson_id,
@@ -37,6 +39,7 @@ def home():
             
             lessons = cursor.fetchall()
             
+            # Calculation stuff result of discussion with ChatGPT or Claude (forgot which one)
             for lesson in lessons:
                 if lesson['current_progress'] and lesson['total_slides'] and lesson['total_slides'] > 0:
                     lesson['progress_percent'] = round(

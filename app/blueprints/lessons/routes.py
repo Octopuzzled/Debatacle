@@ -4,6 +4,8 @@ from app.db_connection import get_connection
 
 lessons_bp = Blueprint('lessons', __name__)
 
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right.
+
 @lessons_bp.route('/lessons')
 def lessons():
     connection = get_connection()
@@ -22,7 +24,7 @@ def lessons():
 
     return render_template('lessons.html', lessons=all_lessons)
 
-@lessons_bp.route("/learn-logic/<int:lesson_id>")
+@lessons_bp.route("/learn-logic/<int:lesson_id>") #help from AI to get this right
 @lessons_bp.route("/learn-logic/<int:lesson_id>/<int:slide_order>")
 def learn_logic(lesson_id, slide_order=None):
     user_id = session.get('user_id')

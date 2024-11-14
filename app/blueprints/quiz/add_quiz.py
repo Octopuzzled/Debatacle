@@ -1,5 +1,9 @@
 from app.db_connection import get_connection, close_connection
 
+# AI helped me creating this quiz. Helped with code and transformed my Quizzes written in markdown
+# into python code. I am grateful for the help. I am the one who wrote the quiz questions and
+# answers.
+
 def add_quiz(lesson_id: int, title: str, questions: list) -> bool:
     """Add or update a quiz for a specific lesson"""
     connection = get_connection()
@@ -61,10 +65,10 @@ def add_quiz(lesson_id: int, title: str, questions: list) -> bool:
         close_connection(connection)
 
 if __name__ == "__main__":
-    # Define your quiz here
+    # Define quizzes here. Works both for updating and adding new quizzes.
     quiz1 = {
-        'lesson_id': 1,  # Change this to your lesson ID
-        'title': 'Introduction Quiz',  # Change this to your quiz title
+        'lesson_id': 1,  
+        'title': 'Introduction Quiz',  
         'questions': [
         {
             'text': 'What are the two main components of an argument?',

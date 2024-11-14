@@ -4,6 +4,8 @@ from app.db_connection import get_connection
 
 slides_bp = Blueprint('slides', __name__)
 
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right.
+
 @slides_bp.route('/api/slide/<int:lesson_id>/<int:slide_order>')
 def get_slide(lesson_id, slide_order):
     connection = get_connection()

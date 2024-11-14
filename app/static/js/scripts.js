@@ -1,3 +1,5 @@
+// I' bad with JS whenever it doesn't look like Python or C or Java. So AI had to help me a lot with the entire JS code.
+
 document.addEventListener('DOMContentLoaded', () => {
     // Check if lessonData is defined
     if (typeof window.lessonData === 'undefined') {

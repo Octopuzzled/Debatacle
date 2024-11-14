@@ -5,7 +5,7 @@ import logging
 from dotenv import load_dotenv
 import os
 
-# Import blueprints
+# Import blueprints - Blueprints where suggested by ChatGPT after I asked how to refactor my very long app.py
 from app.blueprints.main.routes import main_bp
 from app.blueprints.start.routes import start_bp
 from app.blueprints.admin.routes import admin_bp

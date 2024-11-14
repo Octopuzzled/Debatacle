@@ -1,7 +1,9 @@
 from app.utils import error_handling
-from flask import redirect, session, jsonify
+from flask import redirect, session, jsonify, url_for
 from app.db_connection import get_connection
 import bcrypt
+
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right. Also, I oriented myslef on CS50 stock project
 
 def create_password_hash(password):
     # Generate a salt using bcrypt
@@ -53,7 +55,7 @@ def login_user(username, password):
                 cursor.execute("SELECT is_admin FROM users WHERE username = %s", (username,))
                 is_admin = cursor.fetchone()[0]
                 
-                # Return successful login data instead of redirecting
+                # Return successful login data for route
                 return {
                     "success": True,
                     "user_id": user_id,
@@ -74,24 +76,37 @@ def register_user(username, email, password):
     # Check if user already exists
     connection = get_connection()
     if connection is None:
-            return error_handling("Failed to connect to database", 500)
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-    rows = cursor.fetchall()
+        return "Failed to connect to database"
     
-    if len(rows) > 0:
-        cursor.close()
-        return error_handling("User already exists", 400)
-
-    # Generate salt and hash password
-    salt = bcrypt.gensalt()
-    password_hash = bcrypt.hashpw(password.encode(), salt)
-
     try:
-        cursor.execute("INSERT INTO users (username, email, password_hash) VALUES(%s, %s, %s)", (username, email, password_hash))
+        cursor = connection.cursor()
+        
+        # Check for existing user
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        if cursor.fetchone():
+            return "User already exists"
+            
+        # Check for existing email
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        if cursor.fetchone():
+            return "Email already registered"
+
+        # Generate salt and hash password
+        salt = bcrypt.gensalt()
+        password_hash = bcrypt.hashpw(password.encode(), salt)
+
+        # Insert new user with both hash and salt
+        cursor.execute(
+            "INSERT INTO users (username, email, password_hash, password_salt) VALUES(%s, %s, %s, %s)", 
+            (username, email, password_hash, salt)
+        )
         connection.commit()
-        return redirect("/login")
+        
+        return redirect(url_for('auth.login'))
+        
     except Exception as e:
-        return error_handling("Error registering user", 400)
+        return f"Error registering user: {str(e)}"
     finally:
-        cursor.close()
+        if 'cursor' in locals():
+            cursor.close()
+        connection.close()

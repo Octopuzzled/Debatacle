@@ -2,6 +2,7 @@ from typing import Dict, List
 from app.db_connection import get_connection, close_connection
 from app.utils.error_handling import error_handling
 
+# Generally, I asked a lot of questions to ChatGPT and Claude to get this right. The quiz was pretty difficult.
 class QuizHandler:
     def get_quiz_by_lesson(self, lesson_id: int) -> Dict:
         connection = get_connection()
@@ -22,7 +23,7 @@ class QuizHandler:
             if not quiz:
                 return None
             
-            # Get questions and choices
+            # Get questions and choices (query result of conversation with AI about hwo to join this)
             cursor.execute("""
                 SELECT q.question_id, q.question_text,
                        c.choice_id, c.choice_text
@@ -33,7 +34,7 @@ class QuizHandler:
             """, (quiz['quiz_id'],))
             
             questions = {}
-            for row in cursor:
+            for row in cursor: # I thank AI for helping me out here
                 if row['question_id'] not in questions:
                     questions[row['question_id']] = {
                         'id': row['question_id'],

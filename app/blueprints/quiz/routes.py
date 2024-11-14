@@ -9,6 +9,8 @@ from .quiz_handler import QuizHandler
         
 quiz_bp = Blueprint('quiz', __name__)
 
+# I did this mostly myself, but AI helped with the handler and I got al ot of help there. Still, some AI discussions influenced this code
+
 @quiz_bp.route('/lesson/<int:lesson_id>/quiz')
 def get_quiz(lesson_id):
     quiz_handler = QuizHandler()
