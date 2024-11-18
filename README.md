@@ -26,38 +26,40 @@ Final project for the CS50 online course.
 
 ## File Structure
 
+```
 Debatacle/
-├── app.py                        # Flask app
-├── app/                          # Application package directory
-│   ├── \__init__.py              # Flask app initialization and blueprint registration
-│   ├── db_connection.py          # Connection to databank and connection pooling
-│   ├── blueprints/               # Blueprint directory
+├── app.py                       # Flask app
+├── app/                         # Application package directory
+│   ├── __init__.py              # Flask app initialization and blueprint registration
+│   ├── db_connection.py         # Connection to databank and connection pooling
+│   ├── blueprints/              # Blueprint directory
 │   │   ├── admin/
-│   │   │   ├── routes.py         # Admin routes for admin panel, including adding/editing/deleting lessons and slides
-│   │   │   └── utils.py          # Get user progress
+│   │   │   ├── routes.py        # Admin routes for admin panel, including adding/editing/deleting lessons and slides
+│   │   │   └── utils.py         # Get user progress
 │   │   ├── api/
-│   │   │   └── routes.py         # API routes for getting lessons and user progress
+│   │   │   └── routes.py        # API routes for getting lessons and user progress
 │   │   ├── auth/
-│   │   │   ├── routes.py         # Authentication routes for user registration and login/logout
-│   │   │   └── utils.py          # Hashing and verifying passwords, decorated functions
+│   │   │   ├── routes.py        # Authentication routes for user registration and login/logout
+│   │   │   └── utils.py         # Hashing and verifying passwords, decorated functions
 │   │   ├── dashboard/
-│   │   │   ├── routes.py         # Personal user homepage with current progress
-│   │   │   └── utils.py          # Get user progress
+│   │   │   ├── routes.py        # Personal user homepage with current progress
+│   │   │   └── utils.py         # Get user progress
 │   │   ├── lessons/
-│   │   │   └── routes.py         # Routes for overview of existing lessons
+│   │   │   └── routes.py        # Routes for overview of existing lessons
 │   │   ├── main/
-│   │   │   └── routes.py         # Rendering index page
+│   │   │   └── routes.py        # Rendering index page
 │   │   ├── quiz/
-│   │   │   ├── routes.py         # Routes for quiz functionality (getting and submitting)
-│   │   │   ├── quiz_handler.py   # Further quiz logic
-│   │   │   └── add_quiz.py       # Script for adding new quizzes
+│   │   │   ├── routes.py        # Routes for quiz functionality (getting and submitting)
+│   │   │   ├── quiz_handler.py  # Further quiz logic
+│   │   │   └── add_quiz.py      # Script for adding new quizzes
 │   │   └── slides/
-│   │       └── routes.py         # Routes for slides
+│   │       └── routes.py        # Routes for slides
 │   ├── static/
-│   │   ├── css/                  # CSS files
-│   │   ├── js/                   # JavaScript files
-│   │   ├── images/               # Generated using AI: <https://www.seaart.ai>
-│   │   └── templates/            # HTML templates for rendering pages
+│   │   ├── css/                 # CSS files
+│   │   ├── js/                  # JavaScript files
+│   │   ├── images/              # Generated using AI: https://www.seaart.ai
+│   │   └── templates/           # HTML templates for rendering pages
+```
 
 ## Design Choices
 
