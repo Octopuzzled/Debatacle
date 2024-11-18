@@ -11,8 +11,8 @@ Final project for the CS50 online course.
 
 ## Features
 
-- Lectures on argumentation theory
-- Quizzes to test your knowledge
+- Lectures on argumentation theory, covering the basics of argumentation, types of arguments, and common fallacies.
+- Quizzes to test your knowledge (currently single choice)
 - Account registration for progress tracking with personal dashboard
 
 ## Technologies Used
@@ -29,7 +29,7 @@ Final project for the CS50 online course.
 Debatacle/
 ├── app.py                        # Flask app
 ├── app/                          # Application package directory
-│   ├── \__init__.py               # Flask app initialization and blueprint registration
+│   ├── \__init__.py              # Flask app initialization and blueprint registration
 │   ├── db_connection.py          # Connection to databank and connection pooling
 │   ├── blueprints/               # Blueprint directory
 │   │   ├── admin/
@@ -64,6 +64,61 @@ Debatacle/
 ### Database Design Choices
 
 The database schema follows a relational model designed to support an educational platform with lessons, slides, and user progress tracking. Below are the key design decisions and their benefits:
+
+#### Structure overview
+
+```MySQL
+-- Users table
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_salt VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+
+-- Lessons table
+CREATE TABLE lessons (
+    lesson_id INT AUTO_INCREMENT PRIMARY KEY,
+    lesson_name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT
+	total_slides INT
+);
+
+-- Slides table 
+CREATE TABLE slides (
+    slide_id INT AUTO_INCREMENT PRIMARY KEY,
+    lesson_id INT NOT NULL,
+    content TEXT NOT NULL,
+    slide_order INT NOT NULL,
+    FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id) ON DELETE CASCADE
+);
+
+-- User progress table 
+CREATE TABLE user_progress (
+    user_id INT,
+    lesson_id INT,
+    last_slide_id INT,
+    PRIMARY KEY (user_id, lesson_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id) ON DELETE CASCADE,
+    FOREIGN KEY (last_slide_id) REFERENCES slides(slide_id) ON DELETE SET NULL
+);
+
+-- User lesson completion table
+CREATE TABLE lesson_completions (
+    user_id INT,
+    lesson_id INT,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, lesson_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id)
+);
+```
 
 #### Users table
 
@@ -135,5 +190,4 @@ The application uses a modular blueprint architecture to organize routes and fun
 
 ## Contributing
 
-AI was a great help in discussing ideas, finding and fixing bugs and especially in working with
-JavaScript. Frequently, I found bugs on my own but after having a long discussion with AI. The JavaScript code is heavily inspired by the code AI provided regarding more general examples. I also used the code AI provided as a starting point for my own code. I mostly worked with ChatGPT and Claude, occasionally with Gemini.
+AI was a great help in discussing ideas, finding and fixing bugs and especially in working with JavaScript. Frequently, I found bugs on my own but after having a long discussion with AI. The JavaScript code is heavily inspired by the code AI provided regarding more general examples. I also used the code AI provided as a starting point for my own code. I mostly worked with ChatGPT and Claude, occasionally with Gemini.
