@@ -1,13 +1,8 @@
 # Debatacle
 
-#### Video Demo
+#### Video Demo: [Video on YouTube](https://youtu.be/HrhOVRJRuxw)
 
-[Video on YouTube](https://youtu.be/HrhOVRJRuxw)
-
-#### Description
-
-The world is full of arguments. This web app helps you understand them with lectures and quizzes.
-Final project for the CS50 online course.
+#### Description: The world is full of arguments. This web app helps you understand them with lectures and quizzes.Final project for the CS50 online course.
 
 ## Features
 
