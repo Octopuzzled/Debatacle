@@ -7,7 +7,6 @@ import os
 
 # Import blueprints - Blueprints where suggested by ChatGPT after I asked how to refactor my very long app.py
 from app.blueprints.main.routes import main_bp
-from app.blueprints.start.routes import start_bp
 from app.blueprints.admin.routes import admin_bp
 from app.blueprints.lessons.routes import lessons_bp
 from app.blueprints.slides.routes import slides_bp
@@ -36,7 +35,6 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(main_bp)
-    app.register_blueprint(start_bp, url_prefix='/start')
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(lessons_bp, url_prefix='/lessons')

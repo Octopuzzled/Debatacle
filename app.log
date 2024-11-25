@@ -1,3 +1,5 @@
 2024-11-12 12:00:32,172 - ERROR - An unexpected error occurred: Could not build url for endpoint 'quiz.quiz'. Did you mean 'quiz.get_quiz' instead?
 2024-11-12 12:00:35,544 - ERROR - An unexpected error occurred: Could not build url for endpoint 'quiz.quiz'. Did you mean 'quiz.get_quiz' instead?
 2024-11-12 12:00:40,178 - ERROR - An unexpected error occurred: Could not build url for endpoint 'quiz.quiz'. Did you mean 'quiz.get_quiz' instead?
+2024-11-21 15:15:11,369 - ERROR - 127.0.0.1 - - [21/Nov/2024 15:15:11] code 400, message Bad request version ('תת\x13\x01\x13\x02\x13\x03ְ+ְ/ְ,ְ0ּ©ּ¨ְ\x13ְ\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x06\x87\x8a\x8a\x00\x00\x00\x1b\x00\x03\x02\x00\x02\x00-\x00\x02\x01\x01ÿ\x01\x00\x01\x00\x00\x12\x00\x00\x00\x05\x00\x05\x01\x00\x00\x00\x00\x003\x04ן\x04ם\x9a\x9a\x00\x01\x00c\x99\x04ְ\x190;Ú׀')
+2024-11-21 15:15:11,391 - ERROR - 127.0.0.1 - - [21/Nov/2024 15:15:11] code 400, message Bad request version (',כֳ')
